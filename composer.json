@@ -1,5 +1,13 @@
 {
     "name": "ngyuki/db-migrate",
+    "description": "Simple migration tool",
+    "type": "library",
+    "keywords": [ "database", "migrations" ],
+    "homepage": "https://github.com/ngyuki/php-db-migrate",
+    "license": "MIT",
+    "authors": [
+        { "name": "ngyuki", "email": "ngyuki.ts@gmail.com" }
+    ],
     "require": {
         "php": ">=5.3.2",
         "symfony/console": "~2.3",
