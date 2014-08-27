@@ -6,8 +6,8 @@
 
 composer でインストールします。
 
-```
-composer require ngyuki/db-migrate:dev-master
+```console
+$ composer require ngyuki/db-migrate:dev-master
 ```
 
 ### 設定ファイル
@@ -30,8 +30,8 @@ return array(
 
 マイグレーションスクリプトを作成します。
 
-```
-vim sql/migrate/20140827-01.sql
+```console
+$ vim sql/migrate/20140827-01.sql
 ```
 
 スクリプトは SQL で記述します。
@@ -46,7 +46,7 @@ create table tt (
 
 migrate サブコマンドでマイグレーションを実行します。
 
-```
+```console
 $ vendor/bin/db-migrate migrate -v
 migrate: 20140827-01.sql
         create table tt (
@@ -57,7 +57,7 @@ fix version: 20140827-01.sql
 
 status サブコマンドでマイグレーションのステータスを表示します。先頭の `*` とマークされたスクリプトが適用済です。未適用ならマークは表示されません。
 
-```
+```console
 $ vendor/bin/db-migrate status
 * 20140827-01.sql
 ```
@@ -68,7 +68,7 @@ $ vendor/bin/db-migrate status
 
 マイグレーションのステータスを表示します。適用済のスクリプトは `*` でマークされます。
 
-```
+```console
 $ vendor/bin/db-migrate status
 * 20140827-01.sql
 * 20140827-02.sql
@@ -77,7 +77,7 @@ $ vendor/bin/db-migrate status
 
 すべてのスクリプトが適用済の場合は終了コードが 0 になります。未適用のスクリプトがあれば終了コードは 1 になります。
 
-```
+```console
 $ vendor/bin/db-migrate status ; echo "exit code: $?"
 * 20140827-01.sql
 * 20140827-02.sql
@@ -89,8 +89,8 @@ exit code: 1
 
 マイグレーションを実行します。
 
-```
-$ vendor/bin/db-migrate migrate"
+```console
+$ vendor/bin/db-migrate migrate
 migrate: 20140828-01.sql
 fix version: 20140828-01.sql
 ```
@@ -103,7 +103,7 @@ fix version: 20140828-01.sql
 
 マイグレーションスクリプトが適用済であるとマークします。引数としてスクリプトのファイル名を指定します。
 
-```
+```console
 $ vendor/bin/db-migrate fix 20140828-01.sql
 fix version: 20140828-01.sql
 ```
@@ -112,7 +112,7 @@ fix version: 20140828-01.sql
 
 引数として `--all` を付けるとすべてのスクリプトが適用済であるとマークされます。
 
-```
+```console
 $ vendor/bin/db-migrate fix --all
 fix version: 20140828-01.sql
 fix version: 20140828-02.sql
@@ -120,7 +120,7 @@ fix version: 20140828-02.sql
 
 引数として `--clear` を付けるとすべてのスクリプトが未適用であるとマークします（適用済のマークを削除します）。
 
-```
+```console
 $ vendor/bin/db-migrate fix --clear
 clear all version
 ```
@@ -129,20 +129,18 @@ clear all version
 
 指定されたディレクトリのスクリプトを単純に実行します。ディレクトリはカレントディレクトリからの相対パス、または絶対パスで指定してください。
 
-```
+```console
 $ vendor/bin/db-migrate exec sql/routine/
 migrate: 001-view.php.sql
 migrate: 002-procedure.php.sql
 migrate: 003-trigger.php.sql
 ```
 
-ビューやストアドプロシージャは、マイグレーションでバージョン管理するよりも毎回作りなおしたほうが簡単です。
-
-このコマンドはそのようなスクリプトを簡単に実行するために利用できます。
+ビューやストアドプロシージャは、マイグレーションでバージョン管理するよりも毎回作りなおしたほうが簡単です。このコマンドはそのようなスクリプトを実行するために利用できます。
 
 ## マイグレーションスクリプト
 
-マイグレーションスクリプトは次のいずれかの形式で作成できます。形式は拡張子で区別されます。
+マイグレーションスクリプトは次のいずれかの形式で作成できます。形式は拡張子で判断されます。
 
  - SQL
     - 拡張子 `.sql`
@@ -170,7 +168,7 @@ migrate: 003-trigger.php.sql
 
 PHP として実行されます。
 
-コンフィグの `extra` に指定した連想配列が `extract` されます。
+コンフィグの `extract` に指定した連想配列が `extract` されます。
 
 例えば、次のような設定ファイルなら、
 
@@ -181,7 +179,7 @@ $pdo = new \PDO('mysql:dbname=test;host=localhost;charset=utf8', 'user', 'pass')
 return array(
     'pdo' => $pdo,
     'directory' => 'migrate',
-    'extra' => array(
+    'extract' => array(
         'pdo' => $pdo,
         'val' => 12345,
     ),
@@ -192,20 +190,17 @@ return array(
 
 ```php
 <?php
-$stmt = $pdo->prepare('insert into tt values (?)');
-$stmt->bindValue(1, PDO::PARAM_INT);
-$stmt->execute($val);
+$stmt = $pdo->prepare("insert into tt values (?)");
+$stmt->execute(array($val));
 ```
 
 ### SQL+PHP
 
 スクリプトが PHP として実行された後、その出力が SQL として解釈されて実行されます。
 
-PHP 形式の場合と同じく、コンフィグの `extra` に指定した連想配列が `extract` されます。
+PHP 形式の場合と同じく、コンフィグの `extract` に指定した連想配列が `extract` されます。
 
-また、スクリプトで `$this->delimiter('//')` などと記述すると、SQL のデミリタを変更することができます。
-
-例えば、ストアドプロシージャを定義するスクリプトは次のように書くことができます。
+スクリプトで `$this->delimiter('//')` などと記述すると、SQL のデミリタを変更することができます。例えば、ストアドプロシージャを定義するスクリプトは次のように書くことができます。
 
 ```sql
 /* <?php $this->delimiter('//') ?> */
@@ -236,8 +231,8 @@ delimiter ;
 
 オプション `-c` で設定ファイルを指定することもできます。
 
-```
-$ vendor/bin/db-migrate migrate -c sql/config.php"
+```console
+$ vendor/bin/db-migrate migrate -c sql/config.php
 migrate: 20140828-01.sql
 fix version: 20140828-01.sql
 ```
