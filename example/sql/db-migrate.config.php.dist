@@ -1,0 +1,8 @@
+<?php
+$pdo = new \PDO('mysql:dbname=test;host=localhost;charset=utf8', 'user', 'pass');
+
+return array(
+    'pdo' => $pdo,
+    'extract' => array('pdo' => $pdo),
+    'directory' => 'migrate',
+);
