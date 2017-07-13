@@ -8,8 +8,13 @@
     "authors": [
         { "name": "ngyuki", "email": "ngyuki.ts@gmail.com" }
     ],
+    "config": {
+        "platform": {
+            "php": "5.3.3"
+        }
+    },
     "require": {
-        "php": ">=5.3.2",
+        "php": ">=5.3.3",
         "symfony/console": "~2.3",
         "symfony/filesystem": "~2.0",
         "doctrine/dbal": "~2.4"
