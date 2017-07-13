@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  php:
+    build: ./
+    volumes:
+      - ./:/app/
+    working_dir: /app/
+    environment: &mysql
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: test
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+
+  mysql:
+    image: mysql
+    environment:
+      <<: *mysql

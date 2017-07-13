@@ -1,5 +1,10 @@
 <?php
-$pdo = new \PDO('mysql:dbname=test;host=localhost;charset=utf8', 'user', 'pass');
+$host   = getenv('MYSQL_HOST')     ?: 'localhost';
+$user   = getenv('MYSQL_USER')     ?: 'user';
+$pass   = getenv('MYSQL_PASSWORD') ?: 'pass';
+$dbname = getenv('MYSQL_DATABASE') ?: 'test';
+
+$pdo = new \PDO("mysql:dbname=$dbname;host=$host;charset=utf8", $user, $pass);
 
 return array(
     'pdo' => $pdo,
