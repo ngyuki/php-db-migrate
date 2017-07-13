@@ -18,8 +18,7 @@ exec('COMPOSER_VENDOR_DIR=build/vendor composer install --no-dev');
 
 $version = trim(`git describe --tags --always`);
 
-if (strlen($version) === 0)
-{
+if (strlen($version) === 0) {
     echo "Unable detect version.\n\n\t" . "git describe --tags --always\n";
     exit(1);
 }
@@ -40,27 +39,19 @@ $finder->files()->in('build/vendor')
     ->exclude('Tests')
 ;
 
-if (file_exists($phar))
-{
+if (file_exists($phar)) {
     unlink($phar);
 }
 
 $stripWhitespace = function ($source) {
-
     $output = '';
 
-    foreach (token_get_all($source) as $token)
-    {
-        if (is_string($token))
-        {
+    foreach (token_get_all($source) as $token) {
+        if (is_string($token)) {
             $output .= $token;
-        }
-        else if (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT)))
-        {
+        } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
             $output .= str_repeat("\n", substr_count($token[1], "\n"));
-        }
-        elseif (T_WHITESPACE === $token[0])
-        {
+        } elseif (T_WHITESPACE === $token[0]) {
             // reduce wide spaces
             $whitespace = preg_replace('{[ \t]+}', ' ', $token[1]);
 
@@ -71,9 +62,7 @@ $stripWhitespace = function ($source) {
             $whitespace = preg_replace('{\n +}', "\n", $whitespace);
 
             $output .= $whitespace;
-        }
-        else
-        {
+        } else {
             $output .= $token[1];
         }
     }
@@ -87,20 +76,15 @@ $pharObj->addFromString('version', $version);
 $pharObj->setMetadata(array('version' => $version));
 $pharObj->startBuffering();
 
-foreach ($finders as $finder)
-{
+foreach ($finders as $finder) {
     /** @var $file \SplFileInfo */
-    foreach ($finder as $file)
-    {
-        if (pathinfo($file->getPathname(), PATHINFO_EXTENSION) === 'php')
-        {
+    foreach ($finder as $file) {
+        if (pathinfo($file->getPathname(), PATHINFO_EXTENSION) === 'php') {
             $source = file_get_contents($file->getPathname());
             $source = $stripWhitespace($source);
             $pharObj->addFromString($file->getPathname(), $source);
             echo "* " . $file->getPathname() . "\n";
-        }
-        else
-        {
+        } else {
             $pharObj->addFile($file->getPathname());
             echo "  " . $file->getPathname() . "\n";
         }

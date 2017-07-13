@@ -16,8 +16,7 @@ class TestEnv
 
     public function pdo()
     {
-        if (self::$pdo === null)
-        {
+        if (self::$pdo === null) {
             $host = getenv('DB_HOST');
             $port = getenv('DB_PORT');
             $name = getenv('DB_NAME');

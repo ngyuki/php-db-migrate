@@ -51,7 +51,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_nothing()
+    public function migrate_nothing()
     {
         // すべてのバージョンが適用済とする
         $this->manager->fixAllVersions();
@@ -71,7 +71,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_()
+    public function migrate_()
     {
         $this->manager->migrate();
 
@@ -85,7 +85,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_dryRun()
+    public function migrate_dryRun()
     {
         $this->config->dryRun = true;
         $this->manager = new Manager($this->config, $this->env->logger());
@@ -102,7 +102,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_noFix()
+    public function migrate_noFix()
     {
         $this->manager->fixAllVersions();
         $prev = $this->fetch_migrate_versions();
@@ -120,7 +120,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_delete_record()
+    public function migrate_delete_record()
     {
         $this->manager->fixAllVersions();
 
@@ -141,7 +141,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_part()
+    public function migrate_part()
     {
         $this->manager->fixAllVersions();
 
@@ -163,17 +163,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_error()
+    public function migrate_error()
     {
         $this->manager->setScriptDirectory($this->env->files('err'));
 
-        try
-        {
+        try {
             $this->manager->migrate();
             $this->fail();
-        }
-        catch (\Doctrine\DBAL\DBALException $ex)
-        {
+        } catch (\Doctrine\DBAL\DBALException $ex) {
             assertContains('Duplicate entry', $ex->getMessage());
         }
 
@@ -188,7 +185,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function fix_all_versions()
+    public function fix_all_versions()
     {
         $this->manager->fixAllVersions();
 
@@ -199,7 +196,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function status_()
+    public function status_()
     {
         $re = $this->manager->showStatus();
         assertEquals(1, $re);

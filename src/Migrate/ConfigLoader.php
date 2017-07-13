@@ -7,8 +7,7 @@ class ConfigLoader
     {
         $arr = include $fn;
 
-        if (!is_array($arr))
-        {
+        if (!is_array($arr)) {
             throw new \RuntimeException('Should return array from config file.');
         }
 
@@ -26,12 +25,9 @@ class ConfigLoader
             'db-migrate.config.php.dist',
         );
 
-        if (is_file($configPath))
-        {
+        if (is_file($configPath)) {
             return realpath($configPath);
-        }
-        else if (is_dir($configPath))
-        {
+        } elseif (is_dir($configPath)) {
             $files = array(
                 'db-migrate.config.php',
                 'db-migrate.config.php.dist',
@@ -40,25 +36,20 @@ class ConfigLoader
             $configPath = rtrim($configPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         }
 
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $path = $configPath . $file;
 
-            if (file_exists($path))
-            {
+            if (file_exists($path)) {
                 return realpath($path);
             }
         }
 
-        if (strlen($configPath) === 0)
-        {
+        if (strlen($configPath) === 0) {
             throw new \RuntimeException(
                 "Unable resolve config." . PHP_EOL .
                 "default name is \"db-migrate.config.php\" or \"db-migrate.config.php.dist\" in current directory."
             );
-        }
-        else
-        {
+        } else {
             throw new \RuntimeException("Unable resolve config from \"$configPath\".");
         }
     }

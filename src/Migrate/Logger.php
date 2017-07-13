@@ -22,8 +22,7 @@ class Logger
 
     public function verbose($log)
     {
-        if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL)
-        {
+        if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
             $log = preg_replace('/^/m', "\t", $log);
             $this->output->writeln($log);
         }

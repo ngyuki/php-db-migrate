@@ -42,11 +42,11 @@ class Application extends BaseApplication
         $definition = parent::getDefaultInputDefinition();
 
         $definition->setOptions(array(
-            new InputOption('--help',    '-h', InputOption::VALUE_NONE, 'Display this help message.'),
+            new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display this help message.'),
             new InputOption('--verbose', '-v', InputOption::VALUE_NONE, 'Increase the verbosity of messages.'),
             new InputOption('--version', '-V', InputOption::VALUE_NONE, 'Display this application version.'),
-            new InputOption('--ansi',    '',   InputOption::VALUE_NONE, 'Force ANSI output.'),
-            new InputOption('--no-ansi', '',   InputOption::VALUE_NONE, 'Disable ANSI output.'),
+            new InputOption('--ansi', '', InputOption::VALUE_NONE, 'Force ANSI output.'),
+            new InputOption('--no-ansi', '', InputOption::VALUE_NONE, 'Disable ANSI output.'),
         ));
 
         $definition->addOptions(array(

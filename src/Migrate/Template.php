@@ -15,13 +15,10 @@ class Template
     {
         extract(func_get_arg(1));
         ob_start();
-        try
-        {
+        try {
             include func_get_arg(0);
             return ob_get_clean();
-        }
-        catch (\Exception $ex)
-        {
+        } catch (\Exception $ex) {
             ob_end_clean();
             throw $ex;
         }
@@ -33,12 +30,9 @@ class Template
      */
     public function delimiter($delimiter = null)
     {
-        if (func_num_args() === 0)
-        {
+        if (func_num_args() === 0) {
             return $this->delimiter;
-        }
-        else
-        {
+        } else {
             $this->delimiter = $delimiter;
             return $this;
         }

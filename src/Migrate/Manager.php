@@ -68,13 +68,11 @@ class Manager
     {
         $list = $this->listScripts();
 
-        if (array_search($version, $list, true) === false)
-        {
+        if (array_search($version, $list, true) === false) {
             throw new \RuntimeException("version notfound: $version");
         }
 
-        if ($this->dryRun == false)
-        {
+        if ($this->dryRun == false) {
             $this->table->fixVersion($version);
         }
 
@@ -92,12 +90,9 @@ class Manager
     {
         $list = $this->listScripts();
 
-        foreach ($list as $version)
-        {
-            if ($this->table->isApplied($version) == false)
-            {
-                if ($this->dryRun == false)
-                {
+        foreach ($list as $version) {
+            if ($this->table->isApplied($version) == false) {
+                if ($this->dryRun == false) {
                     $this->table->fixVersion($version);
                 }
 
@@ -115,8 +110,7 @@ class Manager
      */
     public function clearVersion()
     {
-        if ($this->dryRun == false)
-        {
+        if ($this->dryRun == false) {
             $this->table->dropTable();
         }
 
@@ -128,24 +122,20 @@ class Manager
      */
     private function listScripts()
     {
-        if ($this->scriptFiles === null)
-        {
+        if ($this->scriptFiles === null) {
             $it = new \DirectoryIterator($this->scriptDirectory);
 
             $list = array();
 
             /* @var $file \SplFileInfo */
-            foreach ($it as $file)
-            {
-                if (!$file->isFile())
-                {
+            foreach ($it as $file) {
+                if (!$file->isFile()) {
                     continue;
                 }
 
                 $fn = $file->getFilename();
 
-                if (preg_match("/^[-._a-zA-Z0-9]+$/", $fn) === 0)
-                {
+                if (preg_match("/^[-._a-zA-Z0-9]+$/", $fn) === 0) {
                     continue;
                 }
 
@@ -170,10 +160,8 @@ class Manager
     {
         $retval = array();
 
-        foreach ($list as $version)
-        {
-            if ($this->table->isApplied($version) == false)
-            {
+        foreach ($list as $version) {
+            if ($this->table->isApplied($version) == false) {
                 $retval[] = $version;
             }
         }
@@ -203,25 +191,19 @@ class Manager
         // 最新バージョン
         $latest = end($list);
 
-        if ($execOnly == false)
-        {
+        if ($execOnly == false) {
             // 未適用のマイグレーションにフィルタ
             $list = $this->filterNotApplied($list);
         }
 
-        if (count($list) == 0)
-        {
+        if (count($list) == 0) {
             $this->logger->log("migrate nothing ... latest version: $latest");
-        }
-        else
-        {
-            foreach ($list as $version)
-            {
+        } else {
+            foreach ($list as $version) {
                 $this->logger->log("migrate: $version");
                 $this->applyMigrate($version);
 
-                if ($execOnly == false)
-                {
+                if ($execOnly == false) {
                     $this->fixVersion($version);
                 }
             }
@@ -236,23 +218,16 @@ class Manager
         // マイグレーションの一覧
         $list = $this->listScripts();
 
-        if (count($list) == 0)
-        {
+        if (count($list) == 0) {
             $this->logger->log("migrate nothing");
             return 0;
-        }
-        else
-        {
+        } else {
             $code = 0;
 
-            foreach ($list as $version)
-            {
-                if ($this->table->isApplied($version))
-                {
+            foreach ($list as $version) {
+                if ($this->table->isApplied($version)) {
                     $this->logger->log("* $version");
-                }
-                else
-                {
+                } else {
                     $this->logger->log("  $version");
                     $code = 1;
                 }

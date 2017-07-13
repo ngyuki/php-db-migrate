@@ -62,46 +62,36 @@ class Executor
 
         $detectedMethod = null;
 
-        foreach ($extensions as $ext => $method)
-        {
-            if (substr($fn, -strlen($ext)) === $ext)
-            {
+        foreach ($extensions as $ext => $method) {
+            if (substr($fn, -strlen($ext)) === $ext) {
                 $detectedMethod = $method;
                 break;
             }
         }
 
-        if ($detectedMethod === null)
-        {
+        if ($detectedMethod === null) {
             $detectedMethod = end($extensions);
         }
 
         $workingDirectory = $this->workingDirectory;
         $previousDirectory = null;
 
-        if ($workingDirectory !== null)
-        {
+        if ($workingDirectory !== null) {
             $previousDirectory = getcwd();
 
-            if (chdir($workingDirectory) == false)
-            {
+            if (chdir($workingDirectory) == false) {
                 throw new \RuntimeException("Unable chdir \"$workingDirectory\".");
             }
         }
 
-        try
-        {
+        try {
             $this->$detectedMethod($fn);
 
-            if ($previousDirectory !== null)
-            {
+            if ($previousDirectory !== null) {
                 chdir($previousDirectory);
             }
-        }
-        catch (\Exception $ex)
-        {
-            if ($previousDirectory !== null)
-            {
+        } catch (\Exception $ex) {
+            if ($previousDirectory !== null) {
                 chdir($previousDirectory);
             }
 
@@ -146,16 +136,13 @@ class Executor
         $sql = $this->stripComment($sql);
         $list = explode($delimiter, $sql);
 
-        foreach ($list as $sql)
-        {
+        foreach ($list as $sql) {
             $sql = trim($sql);
 
-            if (strlen($sql) > 0)
-            {
+            if (strlen($sql) > 0) {
                 $this->logger->verbose($sql . $delimiter);
 
-                if ($this->dryRun == false)
-                {
+                if ($this->dryRun == false) {
                     $this->adapter->exec($sql);
                 }
             }
@@ -167,15 +154,12 @@ class Executor
      */
     protected function executePhp($fn)
     {
-        if ($this->dryRun == false)
-        {
+        if ($this->dryRun == false) {
             extract($this->extract, EXTR_SKIP);
 
             /* @noinspection PhpIncludeInspection */
             require func_get_arg(0);
-        }
-        else
-        {
+        } else {
             $this->logger->verbose("This script is PHP.");
         }
     }

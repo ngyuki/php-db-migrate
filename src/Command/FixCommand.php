@@ -26,25 +26,17 @@ class FixCommand extends AbstractCommand
 
         $num = !!$all + !!$clear + !!strlen($version);
 
-        if ($num > 1)
-        {
+        if ($num > 1) {
             throw new \RuntimeException("You can specify that only one --all, --clear, version.");
         }
 
-        if ($clear)
-        {
+        if ($clear) {
             $this->manager->clearVersion();
-        }
-        else if ($all)
-        {
+        } elseif ($all) {
             $this->manager->fixAllVersions();
-        }
-        else if (strlen($version))
-        {
+        } elseif (strlen($version)) {
             $this->manager->fixVersion($version);
-        }
-        else
-        {
+        } else {
             throw new \RuntimeException("Please specify one of --all, --clear, version.");
         }
     }

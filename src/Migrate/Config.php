@@ -58,20 +58,16 @@ class Config
 
         $this->pdo = $cfg['pdo'];
 
-        if ($this->pdo instanceof \PDO)
-        {
+        if ($this->pdo instanceof \PDO) {
             $this->adapter = new PdoAdapter($this->pdo);
         }
 
         $this->extract = $cfg['extract'];
         $this->scriptDirectory = rtrim($cfg['directory'], DIRECTORY_SEPARATOR);
 
-        if ($fn === null)
-        {
+        if ($fn === null) {
             $this->workingDirectory = getcwd();
-        }
-        else
-        {
+        } else {
             $this->workingDirectory = dirname($fn);
         }
 
@@ -83,8 +79,7 @@ class Config
     {
         $fs = new Filesystem();
 
-        if (!$fs->isAbsolutePath($this->scriptDirectory))
-        {
+        if (!$fs->isAbsolutePath($this->scriptDirectory)) {
             $this->scriptDirectory =
                 $this->workingDirectory . DIRECTORY_SEPARATOR . $this->scriptDirectory;
         }
@@ -92,42 +87,33 @@ class Config
 
     protected function validate()
     {
-        if ($this->pdo instanceof \PDO === false)
-        {
+        if ($this->pdo instanceof \PDO === false) {
             throw new \RuntimeException('Should be PDO is pdo.');
         }
 
-        if ($this->adapter instanceof AdapterInterface === false)
-        {
+        if ($this->adapter instanceof AdapterInterface === false) {
             throw new \RuntimeException('Should be AdapterInterface is adapter.');
         }
 
-        if (!is_array($this->extract))
-        {
+        if (!is_array($this->extract)) {
             throw new \RuntimeException('Should be array is extract.');
         }
     }
 
     public function __get($name)
     {
-        if (property_exists($this, $name) == false)
-        {
+        if (property_exists($this, $name) == false) {
             throw new \LogicException("undefined property $name");
-        }
-        else
-        {
+        } else {
             return $this->$name;
         }
     }
 
     public function __set($name, $value)
     {
-        if (property_exists($this, $name) == false)
-        {
+        if (property_exists($this, $name) == false) {
             throw new \LogicException("undefined property $name");
-        }
-        else
-        {
+        } else {
             $this->$name = $value;
         }
     }

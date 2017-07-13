@@ -31,8 +31,7 @@ class DbTable
 
     public function createTable()
     {
-        if ($this->isExistTable())
-        {
+        if ($this->isExistTable()) {
             return;
         }
 
@@ -56,8 +55,7 @@ class DbTable
 
     public function dropTable()
     {
-        if ($this->isExistTable())
-        {
+        if ($this->isExistTable()) {
             $this->doctrine->getSchemaManager()->dropTable(self::TABLE_NAME);
         }
     }
@@ -69,8 +67,7 @@ class DbTable
      */
     public function fixVersion($version, \DateTime $apply_at = null)
     {
-        if ($apply_at === null)
-        {
+        if ($apply_at === null) {
             $apply_at = new \DateTime();
         }
 
@@ -78,8 +75,7 @@ class DbTable
 
         $this->doctrine->beginTransaction();
 
-        try
-        {
+        try {
             $this->doctrine->delete(self::TABLE_NAME, array(
                 'version' => $version,
             ));
@@ -90,9 +86,7 @@ class DbTable
             ));
 
             $this->doctrine->commit();
-        }
-        catch (\Exception $ex)
-        {
+        } catch (\Exception $ex) {
             $this->doctrine->rollBack();
             throw $ex;
         }
@@ -120,8 +114,7 @@ class DbTable
      */
     public function isApplied($version)
     {
-        if ($this->isExistTable() == false)
-        {
+        if ($this->isExistTable() == false) {
             return false;
         }
 

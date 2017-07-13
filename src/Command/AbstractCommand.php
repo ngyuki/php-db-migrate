@@ -24,8 +24,7 @@ abstract class AbstractCommand extends Command
         parent::initialize($input, $output);
 
         // see http://qiita.com/ngyuki/items/d8db4ab6a954c59ed79d
-        if ($output->getVerbosity() == $output::VERBOSITY_NORMAL && $input->getOption('verbose'))
-        {
+        if ($output->getVerbosity() == $output::VERBOSITY_NORMAL && $input->getOption('verbose')) {
             $output->setVerbosity($output::VERBOSITY_VERBOSE);
         }
 

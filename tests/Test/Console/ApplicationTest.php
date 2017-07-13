@@ -28,7 +28,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     private $tester;
 
-    function setUp()
+    public function setUp()
     {
         $this->env = new TestEnv();
 
@@ -46,7 +46,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function status_()
+    public function status_()
     {
         $fn = $this->env->files();
         $this->tester->run('status', '--config', $fn);
@@ -55,7 +55,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function migrate_()
+    public function migrate_()
     {
         $fn = $this->env->files();
         $this->tester->run('migrate', '--config', $fn);
@@ -64,7 +64,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function exec_()
+    public function exec_()
     {
         $fn = $this->env->files();
         $dir = $this->env->files('ok');
@@ -74,7 +74,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function fix_()
+    public function fix_()
     {
         $fn = $this->env->files();
 
@@ -106,7 +106,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Please specify one of --all, --clear, version.
      */
-    function fix_none()
+    public function fix_none()
     {
         $fn = $this->env->files();
         $this->tester->run('fix', '--config', $fn);
@@ -118,12 +118,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage You can specify that only one --all, --clear, version.
      */
-    function fix_too()
+    public function fix_too()
     {
         $this->tester->runArgs(func_get_args());
     }
 
-    function fix_too_dataProvider()
+    public function fix_too_dataProvider()
     {
         $env = new TestEnv();
         $fn = $env->files();

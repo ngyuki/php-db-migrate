@@ -30,7 +30,7 @@ class DbTableTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function create_and_drop()
+    public function create_and_drop()
     {
         // テーブルは無い
         assertThat($this->table->isExistTable(), isFalse());
@@ -57,7 +57,7 @@ class DbTableTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function fixVersion_getAppliedList()
+    public function fixVersion_getAppliedList()
     {
         $this->table->fixVersion("987654");
 
@@ -84,7 +84,7 @@ class DbTableTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function isApplied_()
+    public function isApplied_()
     {
         assertThat($this->table->isApplied("987654"), isFalse());
 

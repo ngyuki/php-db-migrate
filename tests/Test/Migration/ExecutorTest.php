@@ -49,7 +49,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function execute_sql()
+    public function execute_sql()
     {
         $fn = $this->env->files('/ok/2000.sql');
         $this->executor->execute($fn);
@@ -60,7 +60,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function execute_sql_dryrun()
+    public function execute_sql_dryrun()
     {
         $this->config->dryRun = true;
         $this->executor = new Executor($this->config, $this->env->logger());
@@ -74,7 +74,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function execute_php()
+    public function execute_php()
     {
         $fn = $this->env->files('/ok/3000.php');
         $this->executor->execute($fn);
@@ -85,7 +85,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function execute_php_dryrun()
+    public function execute_php_dryrun()
     {
         $this->config->dryRun = true;
         $this->executor = new Executor($this->config, $this->env->logger());
@@ -99,7 +99,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function execute_sql_php()
+    public function execute_sql_php()
     {
         $this->pdo->exec("DROP PROCEDURE IF EXISTS sp_sample");
 

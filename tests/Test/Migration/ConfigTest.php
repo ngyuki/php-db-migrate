@@ -27,7 +27,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function construct_()
+    public function construct_()
     {
         $extract = array(
             'obj' => new \stdClass(),
@@ -43,7 +43,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $adapter = new PdoAdapter($this->pdo);
 
         assertThat($config->adapter, isInstanceOf(get_class($adapter)));
-        assertThat($config->extract,  identicalTo($extract));
+        assertThat($config->extract, identicalTo($extract));
     }
 
     /**
@@ -51,7 +51,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Should be PDO is pdo.
      */
-    function validate_no_Adapter()
+    public function validate_no_Adapter()
     {
         $cfg = array();
 
@@ -63,7 +63,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Should be array is extract.
      */
-    function validate_no_array_in_extract()
+    public function validate_no_array_in_extract()
     {
         $cfg = array(
             'pdo' => $this->pdo,
