@@ -31,6 +31,10 @@ abstract class AbstractCommand extends Command
         $configPath = $input->getOption('config');
         $dryRun = $input->getOption('dry-run');
 
+        if (strlen($configPath) === 0) {
+            $configPath = getenv('PHP_DB_MIGRATE_CONFIG');
+        }
+
         $loader = new ConfigLoader();
         $fn = $loader->resolve($configPath);
 
