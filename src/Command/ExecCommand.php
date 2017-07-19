@@ -20,7 +20,6 @@ class ExecCommand extends AbstractCommand
     {
         $directory = $input->getArgument('directory');
 
-        $this->manager->setScriptDirectory($directory);
-        $this->manager->migrate(true);
+        $this->manager->exec($directory);
     }
 }

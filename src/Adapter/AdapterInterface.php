@@ -8,8 +8,23 @@ interface AdapterInterface
      */
     public function exec($sql);
 
+    public function createTable();
+
+    public function dropTable();
+
     /**
-     * @return \Doctrine\DBAL\Connection
+     * @return array
      */
-    public function getDoctrine();
+    public function fetchAll();
+
+    /**
+     * @param $version
+     * @param \DateTime|null $apply_at
+     */
+    public function save($version, \DateTime $apply_at = null);
+
+    /**
+     * @param $version
+     */
+    public function delete($version);
 }

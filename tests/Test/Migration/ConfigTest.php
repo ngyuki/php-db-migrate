@@ -4,7 +4,6 @@ namespace Test\Migrate;
 use PDO;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Migrate\Config;
-use ngyuki\DbMigrate\Adapter\PdoAdapter;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,21 +28,19 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function construct_()
     {
-        $extract = array(
+        $args = array(
             'obj' => new \stdClass(),
         );
 
         $cfg = array(
             'pdo' => $this->pdo,
-            'extract' => $extract,
+            'args' => $args,
         );
 
         $config = new Config($cfg, __FILE__);
 
-        $adapter = new PdoAdapter($this->pdo);
-
-        assertThat($config->adapter, isInstanceOf(get_class($adapter)));
-        assertThat($config->extract, identicalTo($extract));
+        assertThat($config->pdo, isInstanceOf('PDO'));
+        assertThat($config->args, identicalTo($args));
     }
 
     /**
@@ -61,13 +58,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Should be array is extract.
+     * @expectedExceptionMessage Should be array is args.
      */
-    public function validate_no_array_in_extract()
+    public function validate_no_array_in_args()
     {
         $cfg = array(
             'pdo' => $this->pdo,
-            'extract' => new \stdClass(),
+            'args' => new \stdClass(),
         );
 
         new Config($cfg, __FILE__);

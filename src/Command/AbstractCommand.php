@@ -1,8 +1,15 @@
 <?php
 namespace ngyuki\DbMigrate\Command;
 
+use ngyuki\DbMigrate\Adapter\Adapter;
+use ngyuki\DbMigrate\Adapter\AdapterInterface;
+use ngyuki\DbMigrate\Executor\ExecutorManager;
+use ngyuki\DbMigrate\Executor\PhpExecutor;
+use ngyuki\DbMigrate\Executor\SqlExecutor;
+use ngyuki\DbMigrate\Migrate\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use ngyuki\DbMigrate\Migrate\ConfigLoader;
@@ -15,6 +22,16 @@ abstract class AbstractCommand extends Command
      * @var Manager
      */
     protected $manager;
+
+    protected function configure()
+    {
+        parent::configure();
+
+        $this->getDefinition()->addOptions(array(
+            new InputOption('--config', '-c', InputOption::VALUE_OPTIONAL, "Config script filename."),
+            new InputOption('--dry-run', '-n', InputOption::VALUE_NONE, "Execute dry run mode."),
+        ));
+    }
 
     /**
      * {@inheritdoc}
@@ -41,8 +58,5 @@ abstract class AbstractCommand extends Command
         $config = $loader->load($fn);
         $config->dryRun = $dryRun;
 
-        $logger = new Logger($output);
-
-        $this->manager = new Manager($config, $logger);
-    }
-}
+        $this->manager = Manager::create(new Logger($output), $config);
+    }}

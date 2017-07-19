@@ -1,12 +1,28 @@
 <?php
 namespace ngyuki\DbMigrate\Migrate;
 
+use ngyuki\DbMigrate\Adapter\Adapter;
+use ngyuki\DbMigrate\Adapter\AdapterInterface;
+use ngyuki\DbMigrate\Executor\ExecutorManager;
+use ngyuki\DbMigrate\Executor\PhpExecutor;
+use ngyuki\DbMigrate\Executor\SqlExecutor;
+
 class Manager
 {
     /**
-     * @var DbTable
+     * @var Logger
      */
-    private $table;
+    private $logger;
+
+    /**
+     * @var AdapterInterface
+     */
+    private $adapter;
+
+    /**
+     * @var ExecutorManager
+     */
+    private $executor;
 
     /**
      * @var string
@@ -19,195 +35,84 @@ class Manager
     private $dryRun = false;
 
     /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var Executor
-     */
-    private $executor;
-
-    /**
-     * @var array
-     */
-    private $scriptFiles = null;
-
-    /**
-     * @param Config $config
      * @param Logger $logger
+     * @param Config $config
+     * @return self
      */
-    public function __construct(Config $config, Logger $logger)
+    public static function create(Logger $logger, Config $config)
+    {
+        $adapter = new Adapter($config->pdo);
+
+        $executor = new ExecutorManager($config->workingDirectory);
+        $executor->add('.php', new PhpExecutor($logger, $config->args, $config->dryRun));
+        $executor->add('.sql', new SqlExecutor($logger, $adapter, $config->dryRun));
+
+        return new Manager($logger, $adapter, $executor, $config->scriptDirectory, $config->dryRun);
+    }
+
+    public function __construct(Logger $logger, AdapterInterface $adapter, ExecutorManager $executor, $scriptDirectory, $dryRun)
     {
         $this->logger = $logger;
-        $this->scriptDirectory = $config->scriptDirectory;
-        $this->dryRun = $config->dryRun;
-        $this->table = new DbTable($config);
-        $this->executor = new Executor($config, $logger);
+        $this->adapter = $adapter;
+        $this->executor = $executor;
+        $this->scriptDirectory = $scriptDirectory;
+        $this->dryRun = $dryRun;
     }
 
     /**
-     * @param $dir
-     * @return $this
-     */
-    public function setScriptDirectory($dir)
-    {
-        $this->scriptFiles = null;
-        $this->scriptDirectory = $dir;
-        return $this;
-    }
-
-    /**
-     * 指定バージョンを適用済を記録
-     *
-     * @param string $version
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function fixVersion($version)
-    {
-        $list = $this->listScripts();
-
-        if (array_search($version, $list, true) === false) {
-            throw new \RuntimeException("version notfound: $version");
-        }
-
-        if ($this->dryRun == false) {
-            $this->table->fixVersion($version);
-        }
-
-        $this->logger->log("fix version: $version");
-
-        return $version;
-    }
-
-    /**
-     * すべてのバージョンを適用済と記録
-     *
-     * @return string
-     */
-    public function fixAllVersions()
-    {
-        $list = $this->listScripts();
-
-        foreach ($list as $version) {
-            if ($this->table->isApplied($version) == false) {
-                if ($this->dryRun == false) {
-                    $this->table->fixVersion($version);
-                }
-
-                $this->logger->log("fix version: $version");
-            }
-        }
-
-        $latest = end($list);
-
-        return $latest;
-    }
-
-    /**
-     * すべてのバージョンを未適用と記録
-     */
-    public function clearVersion()
-    {
-        if ($this->dryRun == false) {
-            $this->table->dropTable();
-        }
-
-        $this->logger->log("clear all version");
-    }
-
-    /**
+     * @param string|null $directory
      * @return array
      */
-    private function listScripts()
+    private function listScripts($directory = null)
     {
-        if ($this->scriptFiles === null) {
-            $it = new \DirectoryIterator($this->scriptDirectory);
+        if ($directory === null) {
+            $directory = $this->scriptDirectory;
+        }
 
-            $list = array();
+        $list = array();
 
+        foreach (new \DirectoryIterator($directory) as $file) {
             /* @var $file \SplFileInfo */
-            foreach ($it as $file) {
-                if (!$file->isFile()) {
-                    continue;
-                }
-
-                $fn = $file->getFilename();
-
-                if (preg_match("/^[-._a-zA-Z0-9]+$/", $fn) === 0) {
-                    continue;
-                }
-
-                $list[] = $fn;
+            if (!$file->isFile()) {
+                continue;
             }
 
-            sort($list);
+            $fn = $file->getFilename();
 
-            $this->scriptFiles = $list;
-        }
-
-        return $this->scriptFiles;
-    }
-
-    /**
-     * 未適用のマイグレーションにフィルタする
-     *
-     * @param array $list
-     * @return array
-     */
-    private function filterNotApplied(array $list)
-    {
-        $retval = array();
-
-        foreach ($list as $version) {
-            if ($this->table->isApplied($version) == false) {
-                $retval[] = $version;
+            if (preg_match("/^[-._a-zA-Z0-9]+$/", $fn) === 0) {
+                continue;
             }
+
+            $list[$fn] = $file->getRealPath();
         }
 
-        return $retval;
+        ksort($list);
+        return $list;
     }
 
-    /**
-     * マイグレーションの適用
-     *
-     * @param string $version
-     */
-    private function applyMigrate($version)
+    private function getStatuses()
     {
-        $fn = $this->scriptDirectory . DIRECTORY_SEPARATOR . $version;
-        $this->executor->execute($fn);
-    }
+        $scripts = $this->listScripts();
+        $versions = $this->adapter->fetchAll();
 
-    /**
-     * マイグレーション
-     */
-    public function migrate($execOnly = false)
-    {
-        // バージョンの一覧
-        $list = $this->listScripts();
+        /** @var $statuses Status[] */
+        $statuses = array();
 
-        // 最新バージョン
-        $latest = end($list);
-
-        if ($execOnly == false) {
-            // 未適用のマイグレーションにフィルタ
-            $list = $this->filterNotApplied($list);
+        foreach ($scripts as $version => $script) {
+            $statuses[$version] = new Status($version);
+            $statuses[$version]->setScript($script);
         }
 
-        if (count($list) == 0) {
-            $this->logger->log("migrate nothing ... latest version: $latest");
-        } else {
-            foreach ($list as $version) {
-                $this->logger->log("migrate: $version");
-                $this->applyMigrate($version);
-
-                if ($execOnly == false) {
-                    $this->fixVersion($version);
-                }
+        foreach ($versions as $version => $_) {
+            if (array_key_exists($version, $statuses) === false) {
+                $statuses[$version] = new Status($version);
             }
+
+            $statuses[$version]->setApplied(true);
         }
+
+        ksort($statuses);
+        return $statuses;
     }
 
     /**
@@ -215,25 +120,193 @@ class Manager
      */
     public function showStatus()
     {
-        // マイグレーションの一覧
-        $list = $this->listScripts();
+        $statuses = $this->getStatuses();
 
-        if (count($list) == 0) {
+        if (count($statuses) == 0) {
             $this->logger->log("migrate nothing");
             return 0;
-        } else {
-            $code = 0;
+        }
 
-            foreach ($list as $version) {
-                if ($this->table->isApplied($version)) {
-                    $this->logger->log("* $version");
-                } else {
-                    $this->logger->log("  $version");
-                    $code = 1;
-                }
+        $code = 0;
+
+        foreach ($statuses as $version => $status) {
+
+            if ($status->hasScript()) {
+                $suffix = "";
+            } else {
+                $suffix = " (missing)";
             }
 
-            return $code;
+
+            if ($status->isApplied()) {
+                $this->logger->log("* {$version}{$suffix}");
+            } else {
+                $this->logger->log("  {$version}{$suffix}");
+                $code = 1;
+            }
+        }
+
+        return $code;
+    }
+
+    /**
+     * マイグレーション
+     *
+     * @param string $target このバージョンまでマイグレートする
+     */
+    public function migrate($target = null)
+    {
+        $migrations = $this->getStatuses();
+
+        $up = array();
+        $down = array();
+
+        foreach ($migrations as $version => $migration) {
+
+            if ($target === null) {
+                // 未指定なら常に UP する（無限大と比較した結果）
+                $cmp = -1;
+            } else {
+                $cmp = strcmp($version, $target);
+            }
+
+            if ($cmp < 0) {
+                if (!$migration->isApplied()) {
+                    $up[$version] = $migration;
+                }
+            } else {
+                if ($migration->isApplied()) {
+                    $down[$version] = $migration;
+                }
+            }
+        }
+
+        ksort($up);
+        krsort($down);
+
+        foreach ($down as $version => $migration) {
+            if ($migration->hasScript()) {
+                $this->logger->log("down: $version");
+                $this->executor->down($migration->getScript());
+                if ($this->dryRun == false) {
+                    $this->adapter->delete($version);
+                }
+            } else {
+                $this->logger->log("unable down: $version (missing)");
+            }
+        }
+
+        foreach ($up as $version => $migration) {
+            if ($migration->hasScript()) {
+                $this->logger->log("up: $version");
+                $this->executor->up($migration->getScript());
+                if ($this->dryRun == false) {
+                    $this->adapter->save($version);
+                }
+            } else {
+                $this->logger->log("unable up: $version (missing)");
+            }
+        }
+
+        if (count($up) === 0 && count($down) === 0) {
+            $latest = "(none)";
+            foreach ($migrations as $version => $migration) {
+                if ($migration->isApplied()) {
+                    $latest = $version;
+                }
+            }
+            $this->logger->log("migrate nothing ... latest version: $latest");
+        }
+    }
+
+    /**
+     * スクリプト実行
+     *
+     * @param string $directory
+     */
+    public function exec($directory)
+    {
+        $scripts = $this->listScripts($directory);
+
+        foreach ($scripts as $name => $script) {
+            $this->logger->log("exec: $name");
+            $this->executor->up($script);
+        }
+    }
+
+    /**
+     * @param string $version
+     */
+    public function setVersion($version)
+    {
+        $statuses = $this->getStatuses();
+
+        if (array_key_exists($version, $statuses) === false) {
+            throw new \RuntimeException("version notfound: $version");
+        }
+
+        $status = $statuses[$version];
+
+        if ($status->isApplied()) {
+            $this->logger->log("version already migrated: $version");
+        } else {
+            if ($this->dryRun == false) {
+                $this->adapter->save($version);
+            }
+            $this->logger->log("set version: $version");
+        }
+    }
+
+    public function setAllVersions()
+    {
+        $statuses = $this->getStatuses();
+
+        foreach ($statuses as $version => $status) {
+            if ($status->isApplied()) {
+                // skip
+            } else {
+                if ($this->dryRun == false) {
+                    $this->adapter->save($version);
+                }
+                $this->logger->log("set version: $version");
+            }
+        }
+    }
+
+    /**
+     * @param string $version
+     */
+    public function unsetVersion($version)
+    {
+        $statuses = $this->getStatuses();
+
+        if (array_key_exists($version, $statuses) === false) {
+            throw new \RuntimeException("version notfound: $version");
+        }
+
+        $status = $statuses[$version];
+
+        if ($status->isApplied() == false) {
+            $this->logger->log("version not migrated: $version");
+        } else {
+            if ($this->dryRun == false) {
+                $this->adapter->delete($version);
+            }
+            $this->logger->log("unset version: $version");
+        }
+    }
+
+    public function unsetAllVersions()
+    {
+        $statuses = $this->getStatuses();
+
+        foreach ($statuses as $version => $status) {
+            if ($status->isApplied() === false) {
+                if ($this->dryRun == false) {
+                    $this->adapter->delete($version);
+                }
+                $this->logger->log("unset version: $version");
+            }
         }
     }
 }

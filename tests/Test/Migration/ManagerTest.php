@@ -1,7 +1,12 @@
 <?php
 namespace Test\Migrate;
 
+use ngyuki\DbMigrate\Adapter\Adapter;
+use ngyuki\DbMigrate\Executor\ExecutorManager;
+use ngyuki\DbMigrate\Executor\PhpExecutor;
+use ngyuki\DbMigrate\Executor\SqlExecutor;
 use PDO;
+use TestHelper\NullLogger;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Migrate\Config;
 use ngyuki\DbMigrate\Migrate\Manager;
@@ -31,12 +36,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->env = new TestEnv();
-
         $this->config = $this->env->config();
-
         $this->pdo = $this->env->pdo();
-
-        $this->manager = new Manager($this->config, $this->env->logger());
+        $this->manager = Manager::create($this->env->logger(), $this->config);
 
         $this->pdo->query("drop table if exists tt");
         $this->pdo->query("drop table if exists db_migrate");
@@ -44,8 +46,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     private function fetch_migrate_versions()
     {
-        return $this->pdo->query("select version from db_migrate order by version")
-            ->fetchAll(PDO::FETCH_COLUMN);
+        return $this->pdo->query("select version from db_migrate order by version")->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
@@ -54,7 +55,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function migrate_nothing()
     {
         // すべてのバージョンが適用済とする
-        $this->manager->fixAllVersions();
+        $this->manager->setAllVersions();
 
         // すべてのバージョンがテーブルに記録されている
         $list = $this->fetch_migrate_versions();
@@ -76,7 +77,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->migrate();
 
         $rows = $this->pdo->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
-        assertEquals(array(1000, 1001, 2000, 3000), $rows);
+        assertEquals(array(1000, 1001, 2000, 3000, 9999), $rows);
 
         $list = $this->fetch_migrate_versions();
         assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $list);
@@ -88,7 +89,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function migrate_dryRun()
     {
         $this->config->dryRun = true;
-        $this->manager = new Manager($this->config, $this->env->logger());
+        $this->manager = Manager::create($this->env->logger(), $this->config);
 
         $this->manager->migrate();
 
@@ -102,13 +103,12 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function migrate_noFix()
+    public function exec_()
     {
-        $this->manager->fixAllVersions();
+        $this->manager->setAllVersions();
         $prev = $this->fetch_migrate_versions();
 
-        $this->manager->setScriptDirectory($this->env->files('ok2'));
-        $this->manager->migrate(true);
+        $this->manager->exec($this->env->files('ok2'));
 
         $rows = $this->pdo->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
         assertEquals(array(1, 2), $rows);
@@ -122,7 +122,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_delete_record()
     {
-        $this->manager->fixAllVersions();
+        $this->manager->setAllVersions();
 
         // マイグレーションのレコードを削除する
         $this->pdo->query("delete from db_migrate");
@@ -131,7 +131,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         // すべてのバージョンが適用される
         $rows = $this->pdo->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
-        assertEquals(array(1000, 1001, 2000, 3000), $rows);
+        assertEquals(array(1000, 1001, 2000, 3000, 9999), $rows);
 
         // すべてのバージョンが適用済
         $list = $this->fetch_migrate_versions();
@@ -143,7 +143,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_part()
     {
-        $this->manager->fixAllVersions();
+        $this->manager->setAllVersions();
 
         // 2000.sql と 3000.php をマイグレーションテーブルから削除する
         $this->pdo->query("delete from db_migrate where version in ('2000.sql', '3000.php')");
@@ -165,7 +165,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_error()
     {
-        $this->manager->setScriptDirectory($this->env->files('err'));
+        $this->config->scriptDirectory = $this->env->files('err');
+        $this->manager = Manager::create($this->env->logger(), $this->config);
 
         try {
             $this->manager->migrate();
@@ -185,9 +186,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function fix_all_versions()
+    public function set_all_versions()
     {
-        $this->manager->fixAllVersions();
+        $this->manager->setAllVersions();
 
         $list = $this->fetch_migrate_versions();
         assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $list);

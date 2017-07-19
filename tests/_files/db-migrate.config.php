@@ -4,6 +4,6 @@ $pdo = $env->pdo();
 
 return array(
     'pdo' => $pdo,
-    'extract' => array('pdo' => $pdo),
+    'args' => array($pdo),
     'directory' => 'ok',
 );

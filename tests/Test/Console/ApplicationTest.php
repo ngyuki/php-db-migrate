@@ -1,6 +1,8 @@
 <?php
 namespace Test\Console;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use PDO;
 use TestHelper\TestEnv;
 use TestHelper\ApplicationTester;
@@ -74,65 +76,85 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function fix_()
+    public function set_all()
     {
         $fn = $this->env->files();
 
-        ///
-
-        $this->tester->run('fix', '--all', '--config', $fn);
+        $this->tester->run('set', '--all', '--config', $fn);
 
         $sql = "select version from db_migrate order by version";
         $list = $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
         assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $list);
+    }
 
-        ///
+    /**
+     * @test
+     */
+    public function set_one()
+    {
+        $fn = $this->env->files();
 
-        $this->tester->run('fix', '--clear', '--config', $fn);
+        $this->tester->run('set', '2000.sql', '--config', $fn);
 
-        $rows = $this->pdo->query("show tables like 'migrate'")->fetchAll();
-        assertEmpty($rows);
-
-        ///
-
-        $this->tester->run('fix', '2000.sql', '--config', $fn);
-
-        $version = $this->pdo->query("select * from db_migrate")->fetchColumn();
+        $version = $this->pdo->query("select version from db_migrate")->fetchColumn();
         assertEquals('2000.sql', $version);
     }
 
     /**
      * @test
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Please specify one of --all, --clear, version.
+     * @expectedExceptionMessage Please specify one of --all, version.
      */
-    public function fix_none()
+    public function set_none()
     {
         $fn = $this->env->files();
-        $this->tester->run('fix', '--config', $fn);
+        $this->tester->run('set', '--config', $fn);
     }
 
     /**
      * @test
-     * @dataProvider fix_too_dataProvider
+     * @dataProvider set_too_many_args_data
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage You can specify that only one --all, --clear, version.
+     * @expectedExceptionMessage You can specify that only one --all, version.
      */
-    public function fix_too()
+    public function set_too_many_args()
     {
         $this->tester->runArgs(func_get_args());
     }
 
-    public function fix_too_dataProvider()
+    public function set_too_many_args_data()
     {
         $env = new TestEnv();
         $fn = $env->files();
 
         return array(
-            array('fix', '--config', $fn, '--all', '--clear', 'version'),
-            array('fix', '--config', $fn, '--all', '--clear'),
-            array('fix', '--config', $fn, '--all', 'version'),
-            array('fix', '--config', $fn, '--clear', 'version'),
+            array('set', '--config', $fn, '--all', 'version'),
+            array('set', '--config', $fn, '--all', 'version'),
         );
+    }
+
+    /**
+     * @test
+     */
+    public function unset_all()
+    {
+        $fn = $this->env->files();
+
+        $this->tester->run('set', '--config', $fn, '--all');
+        $this->tester->run('unset', '--config', $fn, '--all');
+
+        $rows = $this->pdo->query("show tables like 'migrate'")->fetchAll();
+        assertEmpty($rows);
+    }
+
+    /**
+     * @test
+     */
+    public function unset_one()
+    {
+        $fn = $this->env->files();
+
+        $this->tester->run('set', '--config', $fn, '--all');
+        $this->tester->run('unset', '--config', $fn, '2000.sql');
     }
 }

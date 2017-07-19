@@ -14,6 +14,6 @@ class StatusCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->manager->showStatus();
+        $this->manager->showStatus();
     }
 }
