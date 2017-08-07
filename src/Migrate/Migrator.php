@@ -1,7 +1,7 @@
 <?php
 namespace ngyuki\DbMigrate\Migrate;
 
-use ngyuki\DbMigrate\Adapter\Adapter;
+use ngyuki\DbMigrate\Adapter\AdapterFactory;
 use ngyuki\DbMigrate\Adapter\AdapterInterface;
 use ngyuki\DbMigrate\Executor\ExecutorManager;
 use ngyuki\DbMigrate\Executor\PhpExecutor;
@@ -41,7 +41,7 @@ class Migrator
      */
     public static function create(Logger $logger, Config $config)
     {
-        $adapter = new Adapter($config->pdo);
+        $adapter = (new AdapterFactory())->create($config->pdo);;
 
         $executor = new ExecutorManager($config->workingDirectory);
         $executor->add('.php', new PhpExecutor($logger, $config->args, $config->dryRun));

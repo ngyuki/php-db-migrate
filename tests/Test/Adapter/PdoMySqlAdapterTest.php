@@ -3,12 +3,12 @@ namespace Test\Migrate;
 
 use PDO;
 use TestHelper\TestEnv;
-use ngyuki\DbMigrate\Adapter\Adapter;
+use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
 
-class AdapterTest extends \PHPUnit_Framework_TestCase
+class PdoMySqlAdapterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Adapter
+     * @var PdoMySqlAdapter
      */
     private $adapter;
 
@@ -21,7 +21,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
     {
         $env = TestEnv::create();
 
-        $this->adapter = new Adapter($env->pdo());
+        $this->adapter = new PdoMySqlAdapter($env->pdo());
         $this->pdo = $env->pdo();
 
         $this->adapter->dropTable();

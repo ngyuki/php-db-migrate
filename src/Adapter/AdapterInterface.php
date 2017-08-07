@@ -8,10 +8,6 @@ interface AdapterInterface
      */
     public function exec($sql);
 
-    public function createTable();
-
-    public function dropTable();
-
     /**
      * @return array
      */

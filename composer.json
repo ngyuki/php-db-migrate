@@ -16,8 +16,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/console": "~2.6",
-        "symfony/filesystem": "~2.6",
-        "doctrine/dbal": "~2.5"
+        "symfony/filesystem": "~2.6"
     },
     "require-dev": {
         "symfony/finder": "~2.6"

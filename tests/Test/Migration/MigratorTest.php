@@ -2,10 +2,10 @@
 namespace Test\Migrate;
 
 use PDO;
+use PDOException;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Migrate\Config;
 use ngyuki\DbMigrate\Migrate\Migrator;
-use Doctrine\DBAL\DBALException;
 
 class MigratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -167,7 +167,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
         try {
             $this->manager->migrate();
             $this->fail();
-        } catch (DBALException $ex) {
+        } catch (PDOException $ex) {
             assertContains('Duplicate entry', $ex->getMessage());
         }
 
