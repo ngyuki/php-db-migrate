@@ -30,9 +30,9 @@ class SetCommand extends AbstractCommand
         }
 
         if ($all) {
-            $this->manager->setAllVersions();
+            $this->migrator->setAllVersions();
         } elseif (strlen($version)) {
-            $this->manager->setVersion($version);
+            $this->migrator->setVersion($version);
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
         }

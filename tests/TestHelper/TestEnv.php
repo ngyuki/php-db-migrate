@@ -4,6 +4,7 @@ namespace TestHelper;
 use PDO;
 use ngyuki\DbMigrate\Migrate\ConfigLoader;
 use ngyuki\DbMigrate\Migrate\Logger;
+use Symfony\Component\Console\Output\NullOutput;
 
 class TestEnv
 {
@@ -45,7 +46,7 @@ class TestEnv
      */
     public function logger()
     {
-        return new NullLogger();
+        return new Logger(new NullOutput());
     }
 
     public function configFile()

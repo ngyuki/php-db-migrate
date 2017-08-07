@@ -30,9 +30,9 @@ class UnsetCommand extends AbstractCommand
         }
 
         if ($all) {
-            $this->manager->unsetAllVersions();
+            $this->migrator->unsetAllVersions();
         } elseif (strlen($version)) {
-            $this->manager->unsetVersion($version);
+            $this->migrator->unsetVersion($version);
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
         }

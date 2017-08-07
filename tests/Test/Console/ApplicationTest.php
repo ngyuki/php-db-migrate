@@ -1,8 +1,6 @@
 <?php
 namespace Test\Console;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
 use PDO;
 use TestHelper\TestEnv;
 use TestHelper\ApplicationTester;
@@ -45,6 +43,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->tester = new ApplicationTester($this->app);
     }
 
+    private function fetchVersions()
+    {
+        $sql = "select version from db_migrate order by version";
+        return $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
     /**
      * @test
      */
@@ -61,6 +65,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $fn = $this->env->files();
         $this->tester->run('migrate', '--config', $fn);
+
+        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->fetchVersions());
     }
 
     /**
@@ -93,12 +99,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function set_all()
     {
         $fn = $this->env->files();
-
         $this->tester->run('set', '--all', '--config', $fn);
 
-        $sql = "select version from db_migrate order by version";
-        $list = $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
-        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $list);
+        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->fetchVersions());
     }
 
     /**
@@ -107,11 +110,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function set_one()
     {
         $fn = $this->env->files();
-
         $this->tester->run('set', '2000.sql', '--config', $fn);
 
-        $version = $this->pdo->query("select version from db_migrate")->fetchColumn();
-        assertEquals('2000.sql', $version);
+        assertEquals(array('2000.sql'), $this->fetchVersions());
     }
 
     /**
@@ -153,14 +154,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function unset_all()
     {
         $fn = $this->env->files();
-
         $this->tester->run('set', '--config', $fn, '--all');
         $this->tester->run('unset', '--config', $fn, '--all');
 
-        $sql = "select version from db_migrate order by version";
-        $list = $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
-
-        assertEmpty($list);
+        assertEmpty($this->fetchVersions());
     }
 
     /**
@@ -169,13 +166,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function unset_one()
     {
         $fn = $this->env->files();
-
         $this->tester->run('set', '--config', $fn, '--all');
         $this->tester->run('unset', '--config', $fn, '2000.sql');
 
-        $sql = "select version from db_migrate order by version";
-        $list = $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
-
-        assertNotContains('2000.sql', $list);
+        assertNotContains('2000.sql', $this->fetchVersions());
     }
 }

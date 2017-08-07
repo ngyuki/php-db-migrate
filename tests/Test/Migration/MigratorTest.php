@@ -1,17 +1,13 @@
 <?php
 namespace Test\Migrate;
 
-use ngyuki\DbMigrate\Adapter\Adapter;
-use ngyuki\DbMigrate\Executor\ExecutorManager;
-use ngyuki\DbMigrate\Executor\PhpExecutor;
-use ngyuki\DbMigrate\Executor\SqlExecutor;
 use PDO;
-use TestHelper\NullLogger;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Migrate\Config;
-use ngyuki\DbMigrate\Migrate\Manager;
+use ngyuki\DbMigrate\Migrate\Migrator;
+use Doctrine\DBAL\DBALException;
 
-class ManagerTest extends \PHPUnit_Framework_TestCase
+class MigratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var TestEnv
@@ -24,7 +20,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     private $config;
 
     /**
-     * @var Manager
+     * @var Migrator
      */
     private $manager;
 
@@ -38,7 +34,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->env = new TestEnv();
         $this->config = $this->env->config();
         $this->pdo = $this->env->pdo();
-        $this->manager = Manager::create($this->env->logger(), $this->config);
+        $this->manager = Migrator::create($this->env->logger(), $this->config);
 
         $this->pdo->query("drop table if exists tt");
         $this->pdo->query("drop table if exists db_migrate");
@@ -89,7 +85,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function migrate_dryRun()
     {
         $this->config->dryRun = true;
-        $this->manager = Manager::create($this->env->logger(), $this->config);
+        $this->manager = Migrator::create($this->env->logger(), $this->config);
 
         $this->manager->migrate();
 
@@ -166,12 +162,12 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function migrate_error()
     {
         $this->config->scriptDirectory = $this->env->files('err');
-        $this->manager = Manager::create($this->env->logger(), $this->config);
+        $this->manager = Migrator::create($this->env->logger(), $this->config);
 
         try {
             $this->manager->migrate();
             $this->fail();
-        } catch (\Doctrine\DBAL\DBALException $ex) {
+        } catch (DBALException $ex) {
             assertContains('Duplicate entry', $ex->getMessage());
         }
 

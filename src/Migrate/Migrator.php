@@ -7,7 +7,7 @@ use ngyuki\DbMigrate\Executor\ExecutorManager;
 use ngyuki\DbMigrate\Executor\PhpExecutor;
 use ngyuki\DbMigrate\Executor\SqlExecutor;
 
-class Manager
+class Migrator
 {
     /**
      * @var Logger
@@ -47,7 +47,7 @@ class Manager
         $executor->add('.php', new PhpExecutor($logger, $config->args, $config->dryRun));
         $executor->add('.sql', new SqlExecutor($logger, $adapter, $config->dryRun));
 
-        return new Manager($logger, $adapter, $executor, $config->scriptDirectory, $config->dryRun);
+        return new Migrator($logger, $adapter, $executor, $config->scriptDirectory, $config->dryRun);
     }
 
     public function __construct(Logger $logger, AdapterInterface $adapter, ExecutorManager $executor, $scriptDirectory, $dryRun)
@@ -150,39 +150,14 @@ class Manager
     }
 
     /**
-     * マイグレーション
-     *
-     * @param string $target このバージョンまでマイグレートする
+     * @param Status[] $migrations
+     * @param Status[] $up
+     * @param Status[] $down
      */
-    public function migrate($target = null)
+    private function doMigrate(array $migrations, array $up, array $down)
     {
-        $migrations = $this->getStatuses();
-
-        $up = array();
-        $down = array();
-
-        foreach ($migrations as $version => $migration) {
-
-            if ($target === null) {
-                // 未指定なら常に UP する（無限大と比較した結果）
-                $cmp = -1;
-            } else {
-                $cmp = strcmp($version, $target);
-            }
-
-            if ($cmp < 0) {
-                if (!$migration->isApplied()) {
-                    $up[$version] = $migration;
-                }
-            } else {
-                if ($migration->isApplied()) {
-                    $down[$version] = $migration;
-                }
-            }
-        }
-
-        ksort($up);
         krsort($down);
+        ksort($up);
 
         foreach ($down as $version => $migration) {
             if ($migration->hasScript()) {
@@ -209,14 +184,51 @@ class Manager
         }
 
         if (count($up) === 0 && count($down) === 0) {
-            $latest = "(none)";
+            $latest = '(none)';
+
             foreach ($migrations as $version => $migration) {
                 if ($migration->isApplied()) {
                     $latest = $version;
                 }
             }
+
             $this->logger->log("migrate nothing ... latest version: $latest");
         }
+    }
+
+    /**
+     * マイグレーション
+     *
+     * @param string $target このバージョンまでマイグレートする
+     */
+    public function migrate($target = null)
+    {
+        $migrations = $this->getStatuses();
+
+        $up = array();
+        $down = array();
+
+        foreach ($migrations as $version => $migration) {
+
+            if ($target === null) {
+                // 未指定なら常に UP する
+                $cmp = -1;
+            } else {
+                $cmp = strcmp($version, $target);
+            }
+
+            if ($cmp < 0) {
+                if (!$migration->isApplied()) {
+                    $up[$version] = $migration;
+                }
+            } else {
+                if ($migration->isApplied()) {
+                    $down[$version] = $migration;
+                }
+            }
+        }
+
+        $this->doMigrate($migrations, $up, $down);
     }
 
     public function up()
@@ -232,29 +244,7 @@ class Manager
             }
         }
 
-        ksort($up);
-
-        foreach ($up as $version => $migration) {
-            if ($migration->hasScript()) {
-                $this->logger->log("up: $version");
-                $this->executor->up($migration->getScript());
-                if ($this->dryRun == false) {
-                    $this->adapter->save($version);
-                }
-            } else {
-                $this->logger->log("unable up: $version (missing)");
-            }
-        }
-
-        if (count($up) === 0) {
-            $latest = "(none)";
-            foreach ($migrations as $version => $migration) {
-                if ($migration->isApplied()) {
-                    $latest = $version;
-                }
-            }
-            $this->logger->log("migrate nothing ... latest version: $latest");
-        }
+        $this->doMigrate($migrations, $up, array());
     }
 
     public function down()
@@ -270,29 +260,7 @@ class Manager
             }
         }
 
-        krsort($down);
-
-        foreach ($down as $version => $migration) {
-            if ($migration->hasScript()) {
-                $this->logger->log("down: $version");
-                $this->executor->down($migration->getScript());
-                if ($this->dryRun == false) {
-                    $this->adapter->delete($version);
-                }
-            } else {
-                $this->logger->log("unable down: $version (missing)");
-            }
-        }
-
-        if (count($down) === 0) {
-            $latest = "(none)";
-            foreach ($migrations as $version => $migration) {
-                if ($migration->isApplied()) {
-                    $latest = $version;
-                }
-            }
-            $this->logger->log("migrate nothing ... latest version: $latest");
-        }
+        $this->doMigrate($migrations, array(), $down);
     }
 
     /**

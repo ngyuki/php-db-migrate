@@ -15,6 +15,6 @@ class DownCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->manager->down();
+        $this->migrator->down();
     }
 }

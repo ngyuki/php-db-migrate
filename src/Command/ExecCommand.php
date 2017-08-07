@@ -20,6 +20,6 @@ class ExecCommand extends AbstractCommand
     {
         $directory = $input->getArgument('directory');
 
-        $this->manager->exec($directory);
+        $this->migrator->exec($directory);
     }
 }

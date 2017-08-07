@@ -1,12 +1,6 @@
 <?php
 namespace ngyuki\DbMigrate\Command;
 
-use ngyuki\DbMigrate\Adapter\Adapter;
-use ngyuki\DbMigrate\Adapter\AdapterInterface;
-use ngyuki\DbMigrate\Executor\ExecutorManager;
-use ngyuki\DbMigrate\Executor\PhpExecutor;
-use ngyuki\DbMigrate\Executor\SqlExecutor;
-use ngyuki\DbMigrate\Migrate\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,14 +8,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use ngyuki\DbMigrate\Migrate\ConfigLoader;
 use ngyuki\DbMigrate\Migrate\Logger;
-use ngyuki\DbMigrate\Migrate\Manager;
+use ngyuki\DbMigrate\Migrate\Migrator;
 
 abstract class AbstractCommand extends Command
 {
     /**
-     * @var Manager
+     * @var Migrator
      */
-    protected $manager;
+    protected $migrator;
 
     protected function configure()
     {
@@ -58,5 +52,5 @@ abstract class AbstractCommand extends Command
         $config = $loader->load($fn);
         $config->dryRun = $dryRun;
 
-        $this->manager = Manager::create(new Logger($output), $config);
+        $this->migrator = Migrator::create(new Logger($output), $config);
     }}
