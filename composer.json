@@ -6,20 +6,20 @@
     "homepage": "https://github.com/ngyuki/php-db-migrate",
     "license": "MIT",
     "authors": [
-        { "name": "ngyuki", "email": "ngyuki.ts@gmail.com" }
+        { "name": "ngyuki", "email": "ngyuki.jp@gmail.com" }
     ],
     "config": {
         "platform": {
-            "php": "5.3.3"
+            "php": "5.4.16"
         }
     },
     "require": {
-        "php": ">=5.3.3",
-        "symfony/console": "~2.6",
-        "symfony/filesystem": "~2.6"
+        "php": ">=5.4.16",
+        "symfony/console": "~2.8",
+        "symfony/filesystem": "~2.8"
     },
     "require-dev": {
-        "symfony/finder": "~2.6"
+        "symfony/finder": "~2.8"
     },
     "autoload": {
         "psr-4": {
