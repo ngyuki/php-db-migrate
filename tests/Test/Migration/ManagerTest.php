@@ -209,6 +209,30 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function up_down_()
+    {
+        $this->manager->up();
+
+        assertEquals(array('1000.sql'), $this->fetch_migrate_versions());
+
+        $this->manager->setVersion('3000.php');
+        $this->manager->up();
+
+        assertEquals(array('1000.sql', '2000.sql', '3000.php'), $this->fetch_migrate_versions());
+
+        $this->manager->unsetVersion('2000.sql');
+        $this->manager->down();
+
+        assertEquals(array('1000.sql'), $this->fetch_migrate_versions());
+
+        $this->manager->down();
+
+        assertEquals(array(), $this->fetch_migrate_versions());
+    }
+
+    /**
+     * @test
+     */
     public function status_()
     {
         $re = $this->manager->showStatus();

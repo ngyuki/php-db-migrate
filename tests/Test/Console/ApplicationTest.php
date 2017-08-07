@@ -66,6 +66,20 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function up_down_()
+    {
+        $fn = $this->env->files();
+        $this->tester->run('up', '--config', $fn);
+        assertEquals(array("1000.sql"), $this->fetchVersions());
+
+        $this->tester->run('down', '--config', $fn);
+        assertEquals(array(), $this->fetchVersions());
+
+    }
+
+    /**
+     * @test
+     */
     public function exec_()
     {
         $fn = $this->env->files();

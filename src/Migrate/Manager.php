@@ -219,6 +219,82 @@ class Manager
         }
     }
 
+    public function up()
+    {
+        $migrations = $this->getStatuses();
+
+        $up = array();
+
+        foreach ($migrations as $version => $migration) {
+            if ($migration->isApplied() == false) {
+                $up[$version] = $migration;
+                break;
+            }
+        }
+
+        ksort($up);
+
+        foreach ($up as $version => $migration) {
+            if ($migration->hasScript()) {
+                $this->logger->log("up: $version");
+                $this->executor->up($migration->getScript());
+                if ($this->dryRun == false) {
+                    $this->adapter->save($version);
+                }
+            } else {
+                $this->logger->log("unable up: $version (missing)");
+            }
+        }
+
+        if (count($up) === 0) {
+            $latest = "(none)";
+            foreach ($migrations as $version => $migration) {
+                if ($migration->isApplied()) {
+                    $latest = $version;
+                }
+            }
+            $this->logger->log("migrate nothing ... latest version: $latest");
+        }
+    }
+
+    public function down()
+    {
+        $migrations = $this->getStatuses();
+
+        $down = array();
+
+        foreach ($migrations as $version => $migration) {
+            if ($migration->isApplied()) {
+                $down = array();
+                $down[$version] = $migration;
+            }
+        }
+
+        krsort($down);
+
+        foreach ($down as $version => $migration) {
+            if ($migration->hasScript()) {
+                $this->logger->log("down: $version");
+                $this->executor->down($migration->getScript());
+                if ($this->dryRun == false) {
+                    $this->adapter->delete($version);
+                }
+            } else {
+                $this->logger->log("unable down: $version (missing)");
+            }
+        }
+
+        if (count($down) === 0) {
+            $latest = "(none)";
+            foreach ($migrations as $version => $migration) {
+                if ($migration->isApplied()) {
+                    $latest = $version;
+                }
+            }
+            $this->logger->log("migrate nothing ... latest version: $latest");
+        }
+    }
+
     /**
      * スクリプト実行
      *
