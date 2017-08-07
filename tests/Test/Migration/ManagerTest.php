@@ -197,6 +197,18 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function unset_all_versions()
+    {
+        $this->manager->setAllVersions();
+        $this->manager->unsetAllVersions();
+
+        $list = $this->fetch_migrate_versions();
+        assertEquals(array(), $list);
+    }
+
+    /**
+     * @test
+     */
     public function status_()
     {
         $re = $this->manager->showStatus();

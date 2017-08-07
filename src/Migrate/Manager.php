@@ -301,7 +301,7 @@ class Manager
         $statuses = $this->getStatuses();
 
         foreach ($statuses as $version => $status) {
-            if ($status->isApplied() === false) {
+            if ($status->isApplied()) {
                 if ($this->dryRun == false) {
                     $this->adapter->delete($version);
                 }

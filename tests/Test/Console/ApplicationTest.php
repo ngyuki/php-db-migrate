@@ -143,8 +143,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->tester->run('set', '--config', $fn, '--all');
         $this->tester->run('unset', '--config', $fn, '--all');
 
-        $rows = $this->pdo->query("show tables like 'migrate'")->fetchAll();
-        assertEmpty($rows);
+        $sql = "select version from db_migrate order by version";
+        $list = $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
+
+        assertEmpty($list);
     }
 
     /**
@@ -156,5 +158,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->tester->run('set', '--config', $fn, '--all');
         $this->tester->run('unset', '--config', $fn, '2000.sql');
+
+        $sql = "select version from db_migrate order by version";
+        $list = $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
+
+        assertNotContains('2000.sql', $list);
     }
 }
