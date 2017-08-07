@@ -7,7 +7,7 @@
 composer でインストールします。
 
 ```console
-$ composer require ngyuki/db-migrate:dev-master
+$ composer require ngyuki/db-migrate
 ```
 
 ### 設定ファイル
@@ -19,12 +19,12 @@ $ composer require ngyuki/db-migrate:dev-master
 $pdo = new \PDO('mysql:dbname=test;host=localhost;charset=utf8', 'user', 'pass');
 
 return array(
+    // PDO のインスタンス
     'pdo' => $pdo,
+    // マイグレーションスクリプトを配置するディレクトリ（設定ファイルからの相対）
     'directory' => 'migrate',
 );
 ```
-
-`pdo` には PDO のインスタンスを、`directory` にはマイグレーションスクリプトを配置するディレクトリを設定ファイルからの相対パスで指定します。
 
 ### マイグレーションスクリプト
 
@@ -91,11 +91,65 @@ exit code: 1
 ```console
 $ vendor/bin/db-migrate migrate
 up: 20140828-01.sql
+up: 20140829-01.sql
+up: 20140829-02.sql
+up: 20140830-01.php
+up: 20140830-02.sql
 ```
 
 `-n` オプションを付けると実際には実行しません (dry run)。
 
 `-v` オプションを付けると実行した SQL が一緒に表示されます。
+
+マイグレーションのファイル名を指定すると、指定したバージョンまでマイグレーションが実行されます。
+
+```console
+$ vendor/bin/db-migrate migrate 20140829-01.sql
+up: 20140828-01.sql
+up: 20140829-01.sql
+```
+
+指定したファイルとは文字列として比較されるため、存在しないファイル名を指定することもできます。
+
+```console
+$ vendor/bin/db-migrate migrate 20140830
+up: 20140828-01.sql
+up: 20140829-01.sql
+up: 20140829-02.sql
+```
+
+バージョンは戻すこともできます。
+
+```console
+$ vendor/bin/db-migrate migrate 20140829
+down: 20140829-02.sql
+down: 20140829-01.sql
+```
+
+例えば `0` を指定すればすべてのバージョンが戻されます。
+
+```console
+$ vendor/bin/db-migrate migrate 20140829
+down: 20140828-01.sql
+```
+
+### `db-migrate up`
+
+未適用のバージョンを1つだけマイグレーションします。
+
+```console
+$ vendor/bin/db-migrate up
+up: 20140829-02.sql
+```
+
+### `db-migrate down`
+
+適用済のバージョンを1つだけロールバックします。
+
+```console
+$ vendor/bin/db-migrate down
+down: 20140829-02.sql
+```
 
 ### `db-migrate set`
 
@@ -113,7 +167,10 @@ set version: 20140828-01.sql
 ```console
 $ vendor/bin/db-migrate set --all
 set version: 20140828-01.sql
-set version: 20140828-02.sql
+set version: 20140829-01.sql
+set version: 20140829-02.sql
+set version: 20140830-01.php
+set version: 20140830-02.sql
 ```
 
 ### `db-migrate unset`
@@ -130,7 +187,10 @@ unset version: 20140828-01.sql
 ```console
 $ vendor/bin/db-migrate unset --all
 unset version: 20140828-01.sql
-unset version: 20140828-02.sql
+unset version: 20140829-01.sql
+unset version: 20140829-02.sql
+unset version: 20140830-01.php
+unset version: 20140830-02.sql
 ```
 
 ### `db-migrate exec`
@@ -140,11 +200,9 @@ unset version: 20140828-02.sql
 ```console
 $ vendor/bin/db-migrate exec sql/routine/
 exec: 001-view.php.sql
-exec: 002-procedure.php.sql
-exec: 003-trigger.php.sql
 ```
 
-ビューやストアドプロシージャは、マイグレーションでバージョン管理するよりも毎回作りなおしたほうが簡単です。このコマンドはそのようなスクリプトを実行するために利用できます。
+ビューなどは、マイグレーションでバージョン管理するよりも毎回作りなおしたほうが簡単です。このコマンドはそのようなスクリプトを実行するために利用できます。
 
 ## マイグレーションスクリプト
 
@@ -155,13 +213,11 @@ exec: 003-trigger.php.sql
  - PHP
     - 拡張子 `.php`
 
-いずれの形式でも実行時のカレントディレクトリは設定ファイルのあるディレクトリになります。
-
-`LOAD DATA LOCAL INFILE` などで他のファイルを参照する場合、設定ファイルのあるディレクトリからの相対パスで記述する必要があります。
+いずれの形式でも実行時のカレントディレクトリは設定ファイルのあるディレクトリです。`LOAD DATA LOCAL INFILE` などで他のファイルを参照する場合、設定ファイルのあるディレクトリからの相対パスで記述する必要があります。
 
 ### SQL
 
-SQL ファイルです。次のような形式で記述します。
+次のような形式で記述します。
 
 ```sql
 create table tt (
@@ -175,7 +231,7 @@ drop table if exists tt;
 /**/
 ```
 
-`{{ down }}` が含まれている行で、マイグレーションの UP と DOWN を区切っています。この例では DOWM 全体がコメントになるように記述していますが、次のように記述しても同じです。
+`{{ down }}` が含まれている行でマイグレーションの UP と DOWN を区切ります。この例では DOWM 全体がコメントになるように記述していますが、次のように記述しても同じです。
 
 ```sql
 create table tt (
