@@ -48,11 +48,10 @@ migrate サブコマンドでマイグレーションを実行します。
 
 ```console
 $ vendor/bin/db-migrate migrate -v
-migrate: 20140827-01.sql
+up: 20140827-01.sql
         create table tt (
           id int not null primary key
         );
-fix version: 20140827-01.sql
 ```
 
 status サブコマンドでマイグレーションのステータスを表示します。先頭の `*` とマークされたスクリプトが適用済です。未適用ならマークは表示されません。
@@ -91,21 +90,20 @@ exit code: 1
 
 ```console
 $ vendor/bin/db-migrate migrate
-migrate: 20140828-01.sql
-fix version: 20140828-01.sql
+up: 20140828-01.sql
 ```
 
-`-n` オプションを付けると実際には実行しません (dryrun)
+`-n` オプションを付けると実際には実行しません (dry run)。
 
-`-v` オプションを付けると詳細なログを出力します。
+`-v` オプションを付けると実行した SQL が一緒に表示されます。
 
-### `db-migrate fix`
+### `db-migrate set`
 
-マイグレーションスクリプトが適用済であるとマークします。引数としてスクリプトのファイル名を指定します。
+マイグレーションが適用済であるとマークします。引数としてスクリプトのファイル名を指定します。
 
 ```console
-$ vendor/bin/db-migrate fix 20140828-01.sql
-fix version: 20140828-01.sql
+$ vendor/bin/db-migrate set 20140828-01.sql
+set version: 20140828-01.sql
 ```
 
 なんらかの原因でマイグレーションが失敗したときに、手作業でマイグレーションを行った後に失敗したスクリプトを適用済であるとマークするために使用できます。
@@ -113,16 +111,26 @@ fix version: 20140828-01.sql
 引数として `--all` を付けるとすべてのスクリプトが適用済であるとマークされます。
 
 ```console
-$ vendor/bin/db-migrate fix --all
-fix version: 20140828-01.sql
-fix version: 20140828-02.sql
+$ vendor/bin/db-migrate set --all
+set version: 20140828-01.sql
+set version: 20140828-02.sql
 ```
 
-引数として `--clear` を付けるとすべてのスクリプトが未適用であるとマークします（適用済のマークを削除します）。
+### `db-migrate unset`
+
+マイグレーションが未適用であるとマークします。引数としてスクリプトのファイル名を指定します。
 
 ```console
-$ vendor/bin/db-migrate fix --clear
-clear all version
+$ vendor/bin/db-migrate unset 20140828-01.sql
+unset version: 20140828-01.sql
+```
+
+引数として `--all` を付けるとすべてのスクリプトが未適用であるとマークされます。
+
+```console
+$ vendor/bin/db-migrate unset --all
+unset version: 20140828-01.sql
+unset version: 20140828-02.sql
 ```
 
 ### `db-migrate exec`
@@ -131,9 +139,9 @@ clear all version
 
 ```console
 $ vendor/bin/db-migrate exec sql/routine/
-migrate: 001-view.php.sql
-migrate: 002-procedure.php.sql
-migrate: 003-trigger.php.sql
+exec: 001-view.php.sql
+exec: 002-procedure.php.sql
+exec: 003-trigger.php.sql
 ```
 
 ビューやストアドプロシージャは、マイグレーションでバージョン管理するよりも毎回作りなおしたほうが簡単です。このコマンドはそのようなスクリプトを実行するために利用できます。
@@ -146,9 +154,6 @@ migrate: 003-trigger.php.sql
     - 拡張子 `.sql`
  - PHP
     - 拡張子 `.php`
- - SQL+PHP
-    - 拡張子 `.sql.php`
-    - 拡張子 `.php.sql`
 
 いずれの形式でも実行時のカレントディレクトリは設定ファイルのあるディレクトリになります。
 
@@ -156,69 +161,39 @@ migrate: 003-trigger.php.sql
 
 ### SQL
 
-ただの SQL ファイルです。
+SQL ファイルです。次のような形式で記述します。
 
-セミコロンでコマンドが区切られているものとして解釈します。
+```sql
+create table tt (
+  id int not null primary key
+);
 
-ブロックコメント `/* ... */` の中のセミコロンは無視しますが、シングルラインコメント `-- ...` や文字列リテラルにセミコロンを記述すると誤解釈します。また、ストアドプロシージャなどの内部のセミコロンでも誤解釈します。
+/* {{ down }}
 
-そのようなケースでは後述の SQL+PHP 形式を使用してください。
+drop table if exists tt;
+
+/**/
+```
+
+`{{ down }}` が含まれている行で、マイグレーションの UP と DOWN を区切っています。この例では DOWM 全体がコメントになるように記述していますが、次のように記述しても同じです。
+
+```sql
+create table tt (
+  id int not null primary key
+);
+
+{{ down }}
+
+drop table if exists tt;
+```
+
+SQL はセミコロンでコマンドが区切られているものとして解釈します。ブロックコメント `/* ... */` の中のセミコロンは無視しますが、シングルラインコメント `-- ...` や文字列リテラルにセミコロンを記述すると誤解釈します。また、ストアドプロシージャなどの内部のセミコロンでも誤解釈します。
 
 ### PHP
 
-PHP として実行されます。
+**Experimental**
 
-コンフィグの `extract` に指定した連想配列が `extract` されます。
-
-例えば、次のような設定ファイルなら、
-
-```php
-<?php
-$pdo = new \PDO('mysql:dbname=test;host=localhost;charset=utf8', 'user', 'pass');
-
-return array(
-    'pdo' => $pdo,
-    'directory' => 'migrate',
-    'extract' => array(
-        'pdo' => $pdo,
-        'val' => 12345,
-    ),
-);
-```
-
-`$pdo` と `$val` をスクリプトから参照することができます。
-
-```php
-<?php
-$stmt = $pdo->prepare("insert into tt values (?)");
-$stmt->execute(array($val));
-```
-
-### SQL+PHP
-
-スクリプトが PHP として実行された後、その出力が SQL として解釈されて実行されます。
-
-PHP 形式の場合と同じく、コンフィグの `extract` に指定した連想配列が `extract` されます。
-
-スクリプトで `$this->delimiter('//')` などと記述すると、SQL のデミリタを変更することができます。例えば、ストアドプロシージャを定義するスクリプトは次のように書くことができます。
-
-```sql
-/* <?php $this->delimiter('//') ?> */
-/* <?php if(false): ?> */
-delimiter //
-/* <?php endif; ?> */
-
-DROP PROCEDURE IF EXISTS sp_sample;
-CREATE PROCEDURE sp_sample ()
-BEGIN
-  SELECT 1 as one FROM DUAL;
-END
-//
-
-/* <?php if(false): ?> */
-delimiter ;
-/* <?php endif; ?> */
-```
+仕様がぶれっぶれなので使わないでください。
 
 ## 設定ファイル
 
