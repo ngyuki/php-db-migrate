@@ -82,6 +82,28 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function migrate_target()
+    {
+        $this->manager->migrate('3000.php');
+
+        $rows = $this->pdo->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
+        assertEquals(array(1000, 1001, 2000, 3000), $rows);
+
+        $list = $this->fetch_migrate_versions();
+        assertEquals(array('1000.sql', '2000.sql', '3000.php'), $list);
+
+        $this->manager->migrate('1000.sql');
+
+        $rows = $this->pdo->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
+        assertEquals(array(1000, 1001), $rows);
+
+        $list = $this->fetch_migrate_versions();
+        assertEquals(array('1000.sql'), $list);
+    }
+
+    /**
+     * @test
+     */
     public function migrate_dryRun()
     {
         $this->config->dryRun = true;

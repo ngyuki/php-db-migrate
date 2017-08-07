@@ -217,7 +217,7 @@ class Migrator
                 $cmp = strcmp($version, $target);
             }
 
-            if ($cmp < 0) {
+            if ($cmp <= 0) {
                 if (!$migration->isApplied()) {
                     $up[$version] = $migration;
                 }
