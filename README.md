@@ -1,5 +1,11 @@
 # db migrate
 
+[![Build Status](https://travis-ci.org/ngyuki/php-db-migrate.svg?branch=master)](https://travis-ci.org/ngyuki/php-db-migrate)
+[![Coverage Status](https://coveralls.io/repos/github/ngyuki/php-db-migrate/badge.svg)](https://coveralls.io/github/ngyuki/php-db-migrate)
+[![Latest Stable Version](https://poser.pugx.org/ngyuki/db-migrate/version)](https://packagist.org/packages/ngyuki/db-migrate)
+[![Latest Unstable Version](https://poser.pugx.org/ngyuki/db-migrate/v/unstable)](//packagist.org/packages/ngyuki/db-migrate)
+[![License](https://poser.pugx.org/ngyuki/db-migrate/license)](https://packagist.org/packages/ngyuki/db-migrate)
+
 ## 使い方
 
 ### インストール
