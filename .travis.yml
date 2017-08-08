@@ -1,0 +1,40 @@
+language: php
+
+sudo: false
+
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+services:
+  - mysql
+
+env:
+  global:
+    - MYSQL_HOST=127.0.0.1
+    - MYSQL_PORT=3306
+    - MYSQL_USER=root
+    - MYSQL_PASSWORD=""
+    - MYSQL_DATABASE=myapp_test
+
+before_install:
+  - composer install --prefer-dist
+  - mkdir -p build/logs
+  - mysql -e 'CREATE DATABASE myapp_test'
+
+script:
+  - vendor/bin/phpunit --colors --coverage-text --coverage-clover build/logs/clover.xml
+
+after_success:
+  - travis_retry vendor/bin/coveralls -v
+
+branches:
+  except:
+    - /\//

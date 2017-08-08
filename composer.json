@@ -19,7 +19,9 @@
         "symfony/filesystem": "~2.8"
     },
     "require-dev": {
-        "symfony/finder": "~2.8"
+        "symfony/finder": "~2.8",
+        "phpunit/phpunit": "^4.8",
+        "satooshi/php-coveralls": "^1.0"
     },
     "autoload": {
         "psr-4": {

@@ -1,5 +1,5 @@
 /build
 /vendor
 /phpunit.xml
-/example/sql/db-migrate.config.php
 /.php_cs.cache
+/example/sql/db-migrate.config.php

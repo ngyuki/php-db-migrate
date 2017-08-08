@@ -18,11 +18,11 @@ class TestEnv
     public function pdo()
     {
         if (self::$pdo === null) {
-            $host = getenv('DB_HOST');
-            $port = getenv('DB_PORT');
-            $name = getenv('DB_NAME');
-            $user = getenv('DB_USER');
-            $pass = getenv('DB_PASS');
+            $host = getenv('MYSQL_HOST');
+            $port = getenv('MYSQL_PORT');
+            $name = getenv('MYSQL_DATABASE');
+            $user = getenv('MYSQL_USER');
+            $pass = getenv('MYSQL_PASSWORD');
 
             $dsn = sprintf("mysql:dbname=$name;host=$host;port=$port;charset=utf8");
 
