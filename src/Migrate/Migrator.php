@@ -353,4 +353,14 @@ class Migrator
             }
         }
     }
+
+    public function clear()
+    {
+        if ($this->dryRun) {
+            $this->logger->log("clear database ... dry run");
+        } else {
+            $this->adapter->clear();
+            $this->logger->log("clear database");
+        }
+    }
 }

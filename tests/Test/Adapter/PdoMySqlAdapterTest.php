@@ -75,4 +75,16 @@ class PdoMySqlAdapterTest extends \PHPUnit_Framework_TestCase
 
         assertEquals(array("123456", "987654"), array_keys($rows));
     }
+
+    /**
+     * @test
+     */
+    public function clear_()
+    {
+        $this->adapter->createTable();
+        $this->adapter->clear();
+
+        $rows = $this->pdo->query('show tables')->fetchAll();
+        assertEmpty($rows);
+    }
 }

@@ -23,4 +23,6 @@ interface AdapterInterface
      * @param $version
      */
     public function delete($version);
+
+    public function clear();
 }

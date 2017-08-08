@@ -171,4 +171,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         assertNotContains('2000.sql', $this->fetchVersions());
     }
+
+    /**
+     * @test
+     */
+    public function clear_()
+    {
+        $fn = $this->env->files();
+        $this->tester->run('clear', '--config', $fn);
+    }
 }

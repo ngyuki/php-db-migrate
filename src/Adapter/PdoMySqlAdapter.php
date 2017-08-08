@@ -17,9 +17,15 @@ class PdoMySqlAdapter implements AdapterInterface
         $this->pdo = $pdo;
     }
 
+    private function quoteIdentity($name)
+    {
+        // @todo escape
+        return '`' . $name . '`';
+    }
+
     private function quotedTable()
     {
-        return '`' . self::TABLE_NAME . '`';
+        return $this->quoteIdentity(self::TABLE_NAME);
     }
 
     /**
@@ -115,5 +121,14 @@ class PdoMySqlAdapter implements AdapterInterface
 
         $stmt = $this->pdo->prepare("delete from {$this->quotedTable()} where version = ?");
         $stmt->execute(array($version));
+    }
+
+    public function clear()
+    {
+        $database = $this->pdo->query('select database()')->fetchColumn();
+        $quotedDatabase = $this->quoteIdentity($database);
+        $this->pdo->exec("drop database if exists $quotedDatabase");
+        $this->pdo->exec("create database $quotedDatabase");
+        $this->pdo->exec("use $quotedDatabase");
     }
 }

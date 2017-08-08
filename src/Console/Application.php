@@ -28,6 +28,8 @@ class Application extends BaseApplication
         $commands[] = new Command\SetCommand();
         $commands[] = new Command\UnsetCommand();
         $commands[] = new Command\ExecCommand();
+        $commands[] = new Command\ClearCommand();
+
         $this->addCommands($commands);
     }
 

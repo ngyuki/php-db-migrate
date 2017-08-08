@@ -2,4 +2,4 @@
 /vendor
 /phpunit.xml
 /.php_cs.cache
-/example/sql/db-migrate.config.php
+/sql/db-migrate.config.php

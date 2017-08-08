@@ -261,4 +261,31 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
         $re = $this->manager->showStatus();
         assertEquals(0, $re);
     }
+
+    /**
+     * @test
+     */
+    public function clear_()
+    {
+        $this->manager->up();
+        $this->manager->clear();
+        $this->manager->up();
+
+        $roes = $this->fetch_migrate_versions();
+        assertCount(1, $roes);
+    }
+
+    /**
+     * @test
+     */
+    public function clear_dryRun()
+    {
+        $this->manager->up();
+
+        $this->config->dryRun = true;
+        $this->manager = Migrator::create($this->env->logger(), $this->config);
+
+        $roes = $this->fetch_migrate_versions();
+        assertCount(1, $roes);
+    }
 }
