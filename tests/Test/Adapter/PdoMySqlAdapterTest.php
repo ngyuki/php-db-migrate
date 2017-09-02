@@ -20,38 +20,24 @@ class PdoMySqlAdapterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $env = TestEnv::create();
+        $env->clear();
 
-        $this->adapter = new PdoMySqlAdapter($env->pdo());
+        $this->adapter = new PdoMySqlAdapter($env->pdo(), $env->logger());
         $this->pdo = $env->pdo();
-
-        $this->adapter->dropTable();
     }
 
     /**
      * @test
      */
-    public function create_and_drop()
+    public function create_()
     {
-        // テーブルは無い
-        assertThat($this->adapter->isExistTable(), isFalse());
-
-        // テーブルが無くても失敗しない
-        $this->adapter->dropTable();
-
         // テーブルを作成する
         $this->adapter->createTable();
-
-        // テーブルが作成されている
-        assertThat($this->adapter->isExistTable(), isTrue());
 
         // テーブルが作成されていても失敗しない
         $this->adapter->createTable();
 
-        // テーブルを削除する
-        $this->adapter->dropTable();
-
-        // テーブルは無い
-        assertThat($this->adapter->isExistTable(), isFalse());
+        assertTrue(true);
     }
 
     /**

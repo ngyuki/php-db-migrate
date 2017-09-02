@@ -1,6 +1,7 @@
 <?php
 namespace ngyuki\DbMigrate\Adapter;
 
+use ngyuki\DbMigrate\Migrate\Logger;
 use PDO;
 
 class PdoMySqlAdapter implements AdapterInterface
@@ -12,9 +13,15 @@ class PdoMySqlAdapter implements AdapterInterface
      */
     protected $pdo;
 
-    public function __construct(\PDO $pdo)
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct(\PDO $pdo, Logger $logger)
     {
         $this->pdo = $pdo;
+        $this->logger = $logger;
     }
 
     private function quoteIdentity($name)
@@ -36,18 +43,16 @@ class PdoMySqlAdapter implements AdapterInterface
         $this->pdo->exec($sql);
     }
 
-    public function isExistTable()
+    public function createTable()
     {
         $stmt = $this->pdo->query('show tables');
         $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-        return in_array(self::TABLE_NAME, $tables);
-    }
 
-    public function createTable()
-    {
-        if ($this->isExistTable()) {
+        if (in_array(self::TABLE_NAME, $tables)) {
             return;
         }
+
+        $this->logger->log(sprintf("create table %s", self::TABLE_NAME));
 
         $sql = "
             create table {$this->quotedTable()} (
@@ -59,22 +64,24 @@ class PdoMySqlAdapter implements AdapterInterface
         ";
 
         $this->pdo->exec($sql);
-    }
 
-    public function dropTable()
-    {
-        if ($this->isExistTable() == false) {
-            return;
+        if (in_array('db_migrate', $tables)) {
+            $this->logger->log(sprintf("insert into %s from %s", self::TABLE_NAME, 'db_migrate'));
+
+            $this->pdo->query("
+                insert into {$this->quotedTable()} (version, apply_at) select version, apply_at from db_migrate
+            ");
+            $this->pdo->query("
+                drop table db_migrate
+            ");
         }
 
-        $this->pdo->exec("drop table {$this->quotedTable()}");
+        $this->logger->log('');
     }
 
     public function fetchAll()
     {
-        if ($this->isExistTable() == false) {
-            return array();
-        }
+        $this->createTable();
 
         $sql = "select * from {$this->quotedTable()} order by version";
 
@@ -112,9 +119,7 @@ class PdoMySqlAdapter implements AdapterInterface
 
     public function delete($version)
     {
-        if ($this->isExistTable() == false) {
-            return;
-        }
+        $this->createTable();
 
         $stmt = $this->pdo->prepare("delete from {$this->quotedTable()} where version = ?");
         $stmt->execute(array($version));

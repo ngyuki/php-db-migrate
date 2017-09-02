@@ -39,7 +39,7 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("drop table if exists tt");
         $this->pdo->query("create table tt (id int not null primary key)");
 
-        $this->adapter = (new AdapterFactory())->create($this->pdo);
+        $this->adapter = (new AdapterFactory())->create($this->pdo, $this->env->logger());
     }
 
     private function fetch_list()

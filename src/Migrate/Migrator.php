@@ -41,7 +41,7 @@ class Migrator
      */
     public static function create(Logger $logger, Config $config)
     {
-        $adapter = (new AdapterFactory())->create($config->pdo);
+        $adapter = (new AdapterFactory())->create($config->pdo, $logger);
 
         $executor = new ExecutorManager($config->workingDirectory);
 
