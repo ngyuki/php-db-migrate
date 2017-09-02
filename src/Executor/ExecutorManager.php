@@ -47,7 +47,7 @@ class ExecutorManager
     }
 
     /**
-     * @param string $filename
+     * @param callable $callback
      * @throws \Exception
      */
     private function execute(callable $callback)

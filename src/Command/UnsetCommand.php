@@ -13,7 +13,7 @@ class UnsetCommand extends AbstractCommand
         parent::configure();
 
         $this->setName('unset')->setDescription('Unset version')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'Unset all versions')
+            ->addOption('all', '', InputOption::VALUE_NONE, 'Unset all versions')
             ->addArgument('version', InputArgument::OPTIONAL, 'Unset specific version')
         ;
     }

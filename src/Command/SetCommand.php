@@ -13,7 +13,7 @@ class SetCommand extends AbstractCommand
         parent::configure();
 
         $this->setName('set')->setDescription('Set version')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'Set all versions')
+            ->addOption('all', '', InputOption::VALUE_NONE, 'Set all versions')
             ->addArgument('version', InputArgument::OPTIONAL, 'Set specific version')
         ;
     }

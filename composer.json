@@ -30,5 +30,12 @@
     },
     "bin": [
         "bin/db-migrate"
-    ]
+    ],
+    "scripts": {
+        "qa": [
+            "phpunit",
+            "php-cs-fixer fix --diff --dry-run --ansi -v",
+            "phan --color -p"
+        ]
+    }
 }
