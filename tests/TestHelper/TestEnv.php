@@ -2,7 +2,7 @@
 namespace TestHelper;
 
 use PDO;
-use ngyuki\DbMigrate\Migrate\ConfigLoader;
+use ngyuki\DbMigrate\Console\ConfigLoader;
 use ngyuki\DbMigrate\Migrate\Logger;
 use Symfony\Component\Console\Output\NullOutput;
 

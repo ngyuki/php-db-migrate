@@ -40,14 +40,15 @@ class Config
 
     /**
      * @param array  $cfg
-     * @param string $fn
+     * @param string $file
      */
-    public function __construct(array $cfg, $fn)
+    public function __construct(array $cfg, $file = '')
     {
         $cfg += array(
             'pdo' => null,
             'args' => array(),
             'directory' => 'migrate',
+            'work_dir' => '',
         );
 
         $this->pdo = $cfg['pdo'];
@@ -55,10 +56,12 @@ class Config
         $this->args = $cfg['args'];
         $this->scriptDirectory = rtrim($cfg['directory'], DIRECTORY_SEPARATOR);
 
-        if ($fn === null) {
-            $this->workingDirectory = getcwd();
+        if (strlen($cfg['work_dir'])) {
+            $this->workingDirectory = $cfg['work_dir'];
+        } elseif (strlen($file)) {
+            $this->workingDirectory = dirname($file);
         } else {
-            $this->workingDirectory = dirname($fn);
+            $this->workingDirectory = getcwd();
         }
 
         $this->fixRelativePath();

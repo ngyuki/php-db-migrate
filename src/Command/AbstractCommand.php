@@ -6,7 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use ngyuki\DbMigrate\Migrate\ConfigLoader;
+use ngyuki\DbMigrate\Console\ConfigLoader;
 use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\Migrator;
 
@@ -42,14 +42,8 @@ abstract class AbstractCommand extends Command
         $configPath = $input->getOption('config');
         $dryRun = $input->getOption('dry-run');
 
-        if (strlen($configPath) === 0) {
-            $configPath = getenv('PHP_DB_MIGRATE_CONFIG');
-        }
-
         $loader = new ConfigLoader();
-        $fn = $loader->resolve($configPath);
-
-        $config = $loader->load($fn);
+        $config = $loader->load($configPath);
         $config->dryRun = $dryRun;
 
         $this->migrator = Migrator::create(new Logger($output), $config);
