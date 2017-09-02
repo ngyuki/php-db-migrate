@@ -301,3 +301,9 @@ fix version: 20140828-01.sql
 
  - `db-migrate.config.php`
  - `db-migrate.config.php.dist`
+
+## アンドキュメンテッド
+
+- Configure
+  - Configure::register で設定ファイルの内容を返すクロージャーを仕込めば設定ファイルレスにできる
+  - composer autoload-dev.files から実行するスクリプトで Configure::register する想定
