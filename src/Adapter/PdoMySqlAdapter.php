@@ -5,7 +5,7 @@ use PDO;
 
 class PdoMySqlAdapter implements AdapterInterface
 {
-    const TABLE_NAME = 'db_migrate';
+    const TABLE_NAME = 'db_migrate_v3';
 
     /**
      * @var PDO

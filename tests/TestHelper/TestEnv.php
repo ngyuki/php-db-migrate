@@ -1,6 +1,7 @@
 <?php
 namespace TestHelper;
 
+use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
 use PDO;
 use ngyuki\DbMigrate\Console\ConfigLoader;
 use ngyuki\DbMigrate\Migrate\Logger;
@@ -10,9 +11,40 @@ class TestEnv
 {
     private static $pdo;
 
+    public $table;
+
     public static function create()
     {
         return new self;
+    }
+
+    public function __construct()
+    {
+        $this->table = PdoMySqlAdapter::TABLE_NAME;
+    }
+
+    public function clear()
+    {
+        $this->pdo()->query("drop table if exists tt");
+        $this->pdo()->query("drop table if exists $this->table");
+    }
+
+    public function delete($versions)
+    {
+        if ($versions === null) {
+            $this->pdo()->query("delete from $this->table");
+        } else {
+            $stmt = $this->pdo()->prepare("delete from $this->table where version = ?");
+            foreach ($versions as $version) {
+                $stmt->execute([$version]);
+            }
+        }
+    }
+
+    public function versions()
+    {
+        return $this->pdo()->query("select version from $this->table order by version")
+            ->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function pdo()

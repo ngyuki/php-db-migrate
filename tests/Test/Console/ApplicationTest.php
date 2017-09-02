@@ -1,7 +1,6 @@
 <?php
 namespace Test\Console;
 
-use PDO;
 use TestHelper\TestEnv;
 use TestHelper\ApplicationTester;
 use ngyuki\DbMigrate\Console\Application;
@@ -12,11 +11,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      * @var TestEnv
      */
     private $env;
-
-    /**
-     * @var PDO
-     */
-    private $pdo;
 
     /**
      * @var Application
@@ -32,21 +26,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $this->env = new TestEnv();
 
-        $this->pdo = $this->env->pdo();
-        $this->pdo->query("drop table if exists tt");
-        $this->pdo->query("drop table if exists db_migrate");
+        $this->env->clear();
 
         $this->app = new Application();
         $this->app->setCatchExceptions(false);
         $this->app->setAutoExit(false);
 
         $this->tester = new ApplicationTester($this->app);
-    }
-
-    private function fetchVersions()
-    {
-        $sql = "select version from db_migrate order by version";
-        return $this->pdo->query($sql)->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     /**
@@ -66,7 +52,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $fn = $this->env->files();
         $this->tester->run('migrate', '--config', $fn);
 
-        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->fetchVersions());
+        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->env->versions());
     }
 
     /**
@@ -76,10 +62,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         $fn = $this->env->files();
         $this->tester->run('up', '--config', $fn);
-        assertEquals(array("1000.sql"), $this->fetchVersions());
+        assertEquals(array("1000.sql"), $this->env->versions());
 
         $this->tester->run('down', '--config', $fn);
-        assertEquals(array(), $this->fetchVersions());
+        assertEquals(array(), $this->env->versions());
     }
 
     /**
@@ -100,7 +86,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $fn = $this->env->files();
         $this->tester->run('set', '--all', '--config', $fn);
 
-        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->fetchVersions());
+        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->env->versions());
     }
 
     /**
@@ -111,7 +97,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $fn = $this->env->files();
         $this->tester->run('set', '2000.sql', '--config', $fn);
 
-        assertEquals(array('2000.sql'), $this->fetchVersions());
+        assertEquals(array('2000.sql'), $this->env->versions());
     }
 
     /**
@@ -156,7 +142,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->tester->run('set', '--config', $fn, '--all');
         $this->tester->run('unset', '--config', $fn, '--all');
 
-        assertEmpty($this->fetchVersions());
+        assertEmpty($this->env->versions());
     }
 
     /**
@@ -168,7 +154,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->tester->run('set', '--config', $fn, '--all');
         $this->tester->run('unset', '--config', $fn, '2000.sql');
 
-        assertNotContains('2000.sql', $this->fetchVersions());
+        assertNotContains('2000.sql', $this->env->versions());
     }
 
     /**
