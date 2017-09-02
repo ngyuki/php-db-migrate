@@ -2,6 +2,6 @@
 /vendor
 /phpunit.xml
 /.php_cs.cache
-/sql/db-migrate.config.php
+/sql/config.php
 /.bin/
 /.envrc

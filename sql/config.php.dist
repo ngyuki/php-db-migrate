@@ -12,4 +12,5 @@ return array(
     'pdo' => $pdo,
     'directory' => 'migration',
     'args' => array($pdo),
+    'work_dir' => __DIR__,
 );

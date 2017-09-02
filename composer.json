@@ -28,6 +28,11 @@
             "ngyuki\\DbMigrate\\": "src/"
         }
     },
+    "autoload-dev": {
+        "files": [
+            "sql/bootstrap.php"
+        ]
+    },
     "bin": [
         "bin/db-migrate"
     ],
