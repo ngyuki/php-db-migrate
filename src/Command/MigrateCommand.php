@@ -13,7 +13,6 @@ class MigrateCommand extends AbstractCommand
 
         $this->setName('migrate')->setDescription('migration')
             ->addArgument('target', InputArgument::OPTIONAL, 'target version');
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

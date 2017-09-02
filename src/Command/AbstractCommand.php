@@ -53,4 +53,5 @@ abstract class AbstractCommand extends Command
         $config->dryRun = $dryRun;
 
         $this->migrator = Migrator::create(new Logger($output), $config);
-    }}
+    }
+}

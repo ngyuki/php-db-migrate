@@ -76,5 +76,4 @@ class SqlExecutor implements ExecutorInterface
 
         return $file;
     }
-
 }

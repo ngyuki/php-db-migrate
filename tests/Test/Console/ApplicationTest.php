@@ -80,7 +80,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->tester->run('down', '--config', $fn);
         assertEquals(array(), $this->fetchVersions());
-
     }
 
     /**

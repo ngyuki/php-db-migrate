@@ -41,7 +41,7 @@ class Migrator
      */
     public static function create(Logger $logger, Config $config)
     {
-        $adapter = (new AdapterFactory())->create($config->pdo);;
+        $adapter = (new AdapterFactory())->create($config->pdo);
 
         $executor = new ExecutorManager($config->workingDirectory);
         $executor->add('.php', new PhpExecutor($logger, $config->args, $config->dryRun));
@@ -130,7 +130,6 @@ class Migrator
         $code = 0;
 
         foreach ($statuses as $version => $status) {
-
             if ($status->hasScript()) {
                 $suffix = "";
             } else {
@@ -209,7 +208,6 @@ class Migrator
         $down = array();
 
         foreach ($migrations as $version => $migration) {
-
             if ($target === null) {
                 // 未指定なら常に UP する
                 $cmp = -1;

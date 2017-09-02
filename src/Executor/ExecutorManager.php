@@ -30,7 +30,7 @@ class ExecutorManager
     public function up($filename)
     {
         $executor = $this->detectExecutor($filename);
-        $this->execute(function() use ($executor, $filename) {
+        $this->execute(function () use ($executor, $filename) {
             $executor->up($filename);
         });
     }
@@ -41,7 +41,7 @@ class ExecutorManager
     public function down($filename)
     {
         $executor = $this->detectExecutor($filename);
-        $this->execute(function() use ($executor, $filename) {
+        $this->execute(function () use ($executor, $filename) {
             $executor->down($filename);
         });
     }
