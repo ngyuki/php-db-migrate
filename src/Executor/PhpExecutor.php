@@ -27,21 +27,25 @@ class PhpExecutor implements ExecutorInterface
         $this->dryRun = $dryRun;
     }
 
-    public function up($filename)
+    public function up($content)
     {
-        list ($func, ) = $this->validate($this->read($filename));
+        list ($func, ) = $this->validate($this->read($content));
         $this->execute($func);
     }
 
-    public function down($filename)
+    public function down($content)
     {
-        list (, $func) = $this->validate($this->read($filename));
+        list (, $func) = $this->validate($this->read($content));
         $this->execute($func);
     }
 
-    private function read($filename)
+    private function read($content)
     {
-        $arr = require $filename;
+        $tmp = tmpfile();
+        $file = stream_get_meta_data($tmp)['uri'];
+        file_put_contents($file, $content);
+        $arr = include $file;
+        unset($tmp);
 
         if ($arr instanceof \Closure) {
             return array($arr, null);

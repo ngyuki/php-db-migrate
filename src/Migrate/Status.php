@@ -14,6 +14,16 @@ class Status
     private $script;
 
     /**
+     * @var string|null
+     */
+    private $source;
+
+    /**
+     * @var string|null
+     */
+    private $content;
+
+    /**
      * @var bool
      */
     private $applied;
@@ -30,6 +40,13 @@ class Status
     public function setScript($script)
     {
         $this->script = $script;
+        $this->source = null;
+    }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
+        return $this;
     }
 
     /**
@@ -40,14 +57,36 @@ class Status
         $this->applied = $applied;
     }
 
-    public function getScript()
+    public function getContent()
     {
-        return $this->script;
+        if ($this->source === null) {
+            if ($this->script !== null) {
+                $this->source = file_get_contents($this->script);
+            };
+        }
+        if ($this->source !== false && $this->source !== null) {
+            return $this->source;
+        } else {
+            return $this->content;
+        }
     }
 
-    public function hasScript()
+    /**
+     * ファイルでもDBでもどっちでも良いのでスクリプトコンテンツがあるかどうか返す
+     */
+    public function hasContent()
     {
-        return $this->script !== null;
+        return $this->getContent() !== null;
+    }
+
+    /**
+     * マイグレーションスクリプトが存在するかどうか返す
+     *
+     * @return bool
+     */
+    public function isMissing()
+    {
+        return $this->script === null;
     }
 
     public function isApplied()

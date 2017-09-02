@@ -58,4 +58,9 @@ class TestEnv
     {
         return dirname(__DIR__) . '/_files/' . $name;
     }
+
+    public function read($name)
+    {
+        return file_get_contents($this->files($name));
+    }
 }

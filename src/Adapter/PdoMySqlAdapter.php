@@ -53,6 +53,7 @@ class PdoMySqlAdapter implements AdapterInterface
             create table {$this->quotedTable()} (
                 version varchar (255) not null,
                 apply_at datetime not null,
+                content LONGBLOB,
                 primary key (version) 
             )
         ";
@@ -90,12 +91,8 @@ class PdoMySqlAdapter implements AdapterInterface
         return $list;
     }
 
-    public function save($version, \DateTime $apply_at = null)
+    public function save($version, $content)
     {
-        if ($apply_at === null) {
-            $apply_at = new \DateTime();
-        }
-
         $this->createTable();
 
         $this->pdo->beginTransaction();
@@ -103,8 +100,8 @@ class PdoMySqlAdapter implements AdapterInterface
             $stmt = $this->pdo->prepare("delete from {$this->quotedTable()} where version = ?");
             $stmt->execute(array($version));
 
-            $stmt = $this->pdo->prepare("insert into {$this->quotedTable()} (version, apply_at) values (?, ?)");
-            $stmt->execute(array($version, $apply_at->format('Y-m-d\TH:i:s')));
+            $stmt = $this->pdo->prepare("insert into {$this->quotedTable()} (version, content, apply_at) values (?, ?, now())");
+            $stmt->execute(array($version, $content));
 
             $this->pdo->commit();
         } catch (\Exception $ex) {

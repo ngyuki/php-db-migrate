@@ -14,10 +14,11 @@ interface AdapterInterface
     public function fetchAll();
 
     /**
-     * @param $version
-     * @param \DateTime|null $apply_at
+     * @param string $version
+     * @param string $content
+     * @return void
      */
-    public function save($version, \DateTime $apply_at = null);
+    public function save($version, $content);
 
     /**
      * @param $version

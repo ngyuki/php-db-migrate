@@ -26,23 +26,25 @@ class ExecutorManager
 
     /**
      * @param string $filename
+     * @param string $content
      */
-    public function up($filename)
+    public function up($filename, $content)
     {
-        $executor = $this->detectExecutor($filename);
-        $this->execute(function () use ($executor, $filename) {
-            $executor->up($filename);
+        $executor = $this->getExecutor($filename);
+        $this->execute(function () use ($executor, $content) {
+            $executor->up($content);
         });
     }
 
     /**
      * @param string $filename
+     * @param string $content
      */
-    public function down($filename)
+    public function down($filename, $content)
     {
-        $executor = $this->detectExecutor($filename);
-        $this->execute(function () use ($executor, $filename) {
-            $executor->down($filename);
+        $executor = $this->getExecutor($filename);
+        $this->execute(function () use ($executor, $content) {
+            $executor->down($content);
         });
     }
 
@@ -59,7 +61,7 @@ class ExecutorManager
             $previousDirectory = getcwd();
 
             if (chdir($workingDirectory) == false) {
-                throw new \RuntimeException("Unable chdir \"$workingDirectory\".");
+                throw new \RuntimeException("Unable change directory \"$workingDirectory\".");
             }
         }
 
@@ -78,7 +80,11 @@ class ExecutorManager
         }
     }
 
-    private function detectExecutor($filename)
+    /**
+     * @param $filename
+     * @return ExecutorInterface
+     */
+    private function getExecutor($filename)
     {
         foreach ($this->extensions as $extension => $executor) {
             if (substr($filename, -strlen($extension)) === $extension) {
@@ -86,6 +92,7 @@ class ExecutorManager
             }
         }
 
-        return end($this->extensions);
+        $executor = end($this->extensions);
+        return $executor;
     }
 }

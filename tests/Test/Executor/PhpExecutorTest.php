@@ -37,7 +37,7 @@ class PhpExecutorTest extends \PHPUnit_Framework_TestCase
     public function execute_up()
     {
         $executor = new PhpExecutor($this->env->logger(), array($this->pdo), false);
-        $executor->up($this->env->files('/ok/3000.php'));
+        $executor->up($this->env->read('/ok/3000.php'));
 
         assertEquals(array('3000'), $this->fetch_list());
     }
@@ -48,7 +48,7 @@ class PhpExecutorTest extends \PHPUnit_Framework_TestCase
     public function execute_up_dryRun()
     {
         $executor = new PhpExecutor($this->env->logger(), array($this->pdo), true);
-        $executor->up($this->env->files('/ok/3000.php'));
+        $executor->up($this->env->read('/ok/3000.php'));
 
         assertEmpty($this->fetch_list());
     }
@@ -61,7 +61,7 @@ class PhpExecutorTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("insert into tt values ('3000')");
 
         $executor = new PhpExecutor($this->env->logger(), array($this->pdo), false);
-        $executor->down($this->env->files('/ok/3000.php'));
+        $executor->down($this->env->read('/ok/3000.php'));
 
         assertEmpty($this->fetch_list());
     }
@@ -74,7 +74,7 @@ class PhpExecutorTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("insert into tt values ('3000')");
 
         $executor = new PhpExecutor($this->env->logger(), array($this->pdo), true);
-        $executor->down($this->env->files('/ok/3000.php'));
+        $executor->down($this->env->read('/ok/3000.php'));
 
         assertEquals(array('3000'), $this->fetch_list());
     }

@@ -44,7 +44,9 @@ class Migrator
         $adapter = (new AdapterFactory())->create($config->pdo);
 
         $executor = new ExecutorManager($config->workingDirectory);
+
         $executor->add('.php', new PhpExecutor($logger, $config->args, $config->dryRun));
+
         $executor->add('.sql', new SqlExecutor($logger, $adapter, $config->dryRun));
 
         return new Migrator($logger, $adapter, $executor, $config->scriptDirectory, $config->dryRun);
@@ -103,12 +105,13 @@ class Migrator
             $statuses[$version]->setScript($script);
         }
 
-        foreach ($versions as $version => $_) {
+        foreach ($versions as $version => $row) {
             if (array_key_exists($version, $statuses) === false) {
                 $statuses[$version] = new Status($version);
             }
 
             $statuses[$version]->setApplied(true);
+            $statuses[$version]->setContent($row['content']);
         }
 
         ksort($statuses);
@@ -130,12 +133,11 @@ class Migrator
         $code = 0;
 
         foreach ($statuses as $version => $status) {
-            if ($status->hasScript()) {
-                $suffix = "";
-            } else {
+            if ($status->isMissing()) {
                 $suffix = " (missing)";
+            } else {
+                $suffix = "";
             }
-
 
             if ($status->isApplied()) {
                 $this->logger->log("* {$version}{$suffix}");
@@ -159,9 +161,9 @@ class Migrator
         ksort($up);
 
         foreach ($down as $version => $migration) {
-            if ($migration->hasScript()) {
+            if ($migration->hasContent()) {
                 $this->logger->log("down: $version");
-                $this->executor->down($migration->getScript());
+                $this->executor->down($version, $migration->getContent());
                 if ($this->dryRun == false) {
                     $this->adapter->delete($version);
                 }
@@ -171,11 +173,11 @@ class Migrator
         }
 
         foreach ($up as $version => $migration) {
-            if ($migration->hasScript()) {
+            if ($migration->hasContent()) {
                 $this->logger->log("up: $version");
-                $this->executor->up($migration->getScript());
+                $this->executor->up($version, $migration->getContent());
                 if ($this->dryRun == false) {
-                    $this->adapter->save($version);
+                    $this->adapter->save($version, $migration->getContent());
                 }
             } else {
                 $this->logger->log("unable up: $version (missing)");
@@ -213,6 +215,11 @@ class Migrator
                 $cmp = -1;
             } else {
                 $cmp = strcmp($version, $target);
+            }
+
+            if ($migration->isMissing() === null) {
+                // ファイルが見つからなければ DOWN する
+                $cmp = 1;
             }
 
             if ($cmp <= 0) {
@@ -271,8 +278,10 @@ class Migrator
         $scripts = $this->listScripts($directory);
 
         foreach ($scripts as $name => $script) {
+            $migration = new Status($name);
+            $migration->setScript($script);
             $this->logger->log("exec: $name");
-            $this->executor->up($script);
+            $this->executor->up($name, $migration->getContent());
         }
     }
 
@@ -284,16 +293,18 @@ class Migrator
         $statuses = $this->getStatuses();
 
         if (array_key_exists($version, $statuses) === false) {
-            throw new \RuntimeException("version notfound: $version");
+            throw new \RuntimeException("version not found: $version");
         }
 
         $status = $statuses[$version];
 
         if ($status->isApplied()) {
             $this->logger->log("version already migrated: $version");
+        } elseif ($status->hasContent() == false) {
+            $this->logger->log("set version: $version is missing");
         } else {
             if ($this->dryRun == false) {
-                $this->adapter->save($version);
+                $this->adapter->save($version, $status->getContent());
             }
             $this->logger->log("set version: $version");
         }
@@ -306,9 +317,11 @@ class Migrator
         foreach ($statuses as $version => $status) {
             if ($status->isApplied()) {
                 // skip
+            } elseif ($status->hasContent() == false) {
+                $this->logger->log("set version: $version is missing");
             } else {
                 if ($this->dryRun == false) {
-                    $this->adapter->save($version);
+                    $this->adapter->save($version, $status->getContent());
                 }
                 $this->logger->log("set version: $version");
             }
@@ -323,7 +336,7 @@ class Migrator
         $statuses = $this->getStatuses();
 
         if (array_key_exists($version, $statuses) === false) {
-            throw new \RuntimeException("version notfound: $version");
+            throw new \RuntimeException("version not found: $version");
         }
 
         $status = $statuses[$version];

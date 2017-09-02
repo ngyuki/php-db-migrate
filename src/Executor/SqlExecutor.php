@@ -28,22 +28,21 @@ class SqlExecutor implements ExecutorInterface
         $this->dryRun = $dryRun;
     }
 
-    public function up($filename)
+    public function up($content)
     {
-        list ($sql) = $this->read($filename);
+        list ($sql) = $this->read($content);
         $this->execute($sql);
     }
 
-    public function down($filename)
+    public function down($content)
     {
-        list (, $sql) = $this->read($filename);
+        list (, $sql) = $this->read($content);
         $this->execute($sql);
     }
 
-    private function read($filename)
+    private function read($content)
     {
-        $file = file_get_contents($filename);
-        list ($up, $down) = preg_split('/^.*\{\{ *down *\}\}.*$/m', $file, 2) + array(null, null);
+        list ($up, $down) = preg_split('/^.*\{\{ *down *\}\}.*$/m', $content, 2) + array(null, null);
         return array($up, $down);
     }
 

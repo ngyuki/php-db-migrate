@@ -3,7 +3,7 @@ namespace ngyuki\DbMigrate\Executor;
 
 interface ExecutorInterface
 {
-    public function up($filename);
+    public function up($content);
 
-    public function down($filename);
+    public function down($content);
 }

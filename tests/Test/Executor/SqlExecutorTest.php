@@ -53,7 +53,7 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
     public function execute_up()
     {
         $executor = new SqlExecutor($this->env->logger(), $this->adapter, false);
-        $executor->up($this->env->files('/ok/2000.sql'));
+        $executor->up($this->env->read('/ok/2000.sql'));
 
         assertEquals(array("2000"), $this->fetch_list());
     }
@@ -64,7 +64,7 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
     public function execute_up_dryRun()
     {
         $executor = new SqlExecutor($this->env->logger(), $this->adapter, true);
-        $executor->up($this->env->files('/ok/2000.sql'));
+        $executor->up($this->env->read('/ok/2000.sql'));
 
         assertEmpty($this->fetch_list());
     }
@@ -77,7 +77,7 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("insert into tt values ('2000')");
 
         $executor = new SqlExecutor($this->env->logger(), $this->adapter, false);
-        $executor->down($this->env->files('/ok/2000.sql'));
+        $executor->down($this->env->read('/ok/2000.sql'));
 
         assertEmpty($this->fetch_list());
     }
@@ -90,7 +90,7 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("insert into tt values ('2000')");
 
         $executor = new SqlExecutor($this->env->logger(), $this->adapter, true);
-        $executor->down($this->env->files('/ok/2000.sql'));
+        $executor->down($this->env->read('/ok/2000.sql'));
 
         assertEquals(array('2000'), $this->fetch_list());
     }

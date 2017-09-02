@@ -59,13 +59,13 @@ class PdoMySqlAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function save_fetch()
     {
-        $this->adapter->save("987654");
+        $this->adapter->save("987654", "aaa");
 
         $rows = $this->pdo->query("select * from db_migrate order by version")->fetchAll(PDO::FETCH_COLUMN);
 
         assertEquals(array("987654"), $rows);
 
-        $this->adapter->save("123456");
+        $this->adapter->save("123456", "xxx");
 
         $rows = $this->pdo->query("select * from db_migrate order by version")->fetchAll(PDO::FETCH_COLUMN);
 
