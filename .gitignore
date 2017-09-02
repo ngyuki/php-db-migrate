@@ -3,3 +3,5 @@
 /phpunit.xml
 /.php_cs.cache
 /sql/db-migrate.config.php
+/.bin/
+/.envrc
