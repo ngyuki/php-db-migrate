@@ -1,8 +1,8 @@
 <?php
-$host   = getenv('MYSQL_HOST')     ?: 'localhost';
-$user   = getenv('MYSQL_USER')     ?: 'user';
-$pass   = getenv('MYSQL_PASSWORD') ?: 'pass';
-$dbname = getenv('MYSQL_DATABASE') ?: 'test';
+$host   = getenv('MYSQL_HOST')     !== false ? getenv('MYSQL_HOST')     : 'localhost';
+$user   = getenv('MYSQL_USER')     !== false ? getenv('MYSQL_USER')     : 'user';
+$pass   = getenv('MYSQL_PASSWORD') !== false ? getenv('MYSQL_PASSWORD') : 'pass';
+$dbname = getenv('MYSQL_DATABASE') !== false ? getenv('MYSQL_DATABASE') : 'test';
 
 $pdo = new PDO("mysql:dbname=$dbname;host=$host;charset=utf8", $user, $pass, array(
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -10,6 +10,6 @@ $pdo = new PDO("mysql:dbname=$dbname;host=$host;charset=utf8", $user, $pass, arr
 
 return array(
     'pdo' => $pdo,
-    'directory' => 'migrate',
+    'directory' => 'migration',
     'args' => array($pdo),
 );
