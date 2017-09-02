@@ -24,6 +24,7 @@ class Application extends BaseApplication
         $commands[] = new Command\MigrateCommand();
         $commands[] = new Command\UpCommand();
         $commands[] = new Command\DownCommand();
+        $commands[] = new Command\RedoCommand();
         $commands[] = new Command\StatusCommand();
         $commands[] = new Command\SetCommand();
         $commands[] = new Command\UnsetCommand();

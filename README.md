@@ -157,6 +157,16 @@ $ vendor/bin/db-migrate down
 down: 20140829-02.sql
 ```
 
+### `db-migrate redo`
+
+down -> up を連続して実行します。
+
+```console
+$ vendor/bin/db-migrate redo
+down: 20140829-02.sql
+up: 20140829-02.sql
+```
+
 ### `db-migrate set`
 
 マイグレーションが適用済であるとマークします。引数としてスクリプトのファイル名を指定します。
