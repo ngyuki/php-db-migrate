@@ -2,6 +2,7 @@
 namespace ngyuki\DbMigrate\Executor;
 
 use ngyuki\DbMigrate\Migrate\Logger;
+use ngyuki\DbMigrate\Migrate\MigrateContext;
 
 class PhpExecutor implements ExecutorInterface
 {
@@ -11,19 +12,19 @@ class PhpExecutor implements ExecutorInterface
     private $logger;
 
     /**
-     * @var array
+     * @var MigrateContext
      */
-    private $args;
+    private $context;
 
     /**
      * @var bool
      */
     private $dryRun;
 
-    public function __construct(Logger $logger, $args, $dryRun)
+    public function __construct(Logger $logger, MigrateContext $context, $dryRun)
     {
         $this->logger = $logger;
-        $this->args = $args;
+        $this->context = $context;
         $this->dryRun = $dryRun;
     }
 
@@ -44,6 +45,7 @@ class PhpExecutor implements ExecutorInterface
         $tmp = tmpfile();
         $file = stream_get_meta_data($tmp)['uri'];
         file_put_contents($file, $content);
+        /** @noinspection PhpIncludeInspection */
         $arr = include $file;
         unset($tmp);
 
@@ -80,7 +82,7 @@ class PhpExecutor implements ExecutorInterface
         $this->logger->verbose("execute php script...");
 
         if ($this->dryRun == false) {
-            call_user_func_array($func, $this->args);
+            call_user_func($func, $this->context);
         }
     }
 }
