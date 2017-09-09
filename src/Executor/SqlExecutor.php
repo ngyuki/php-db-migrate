@@ -2,30 +2,17 @@
 namespace ngyuki\DbMigrate\Executor;
 
 use ngyuki\DbMigrate\Adapter\AdapterInterface;
-use ngyuki\DbMigrate\Migrate\Logger;
 
 class SqlExecutor implements ExecutorInterface
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
     /**
      * @var AdapterInterface
      */
     private $adapter;
 
-    /**
-     * @var bool
-     */
-    private $dryRun;
-
-    public function __construct(Logger $logger, AdapterInterface $adapter, $dryRun)
+    public function __construct(AdapterInterface $adapter)
     {
-        $this->logger = $logger;
         $this->adapter = $adapter;
-        $this->dryRun = $dryRun;
     }
 
     public function up($content)
@@ -54,11 +41,7 @@ class SqlExecutor implements ExecutorInterface
         foreach ($list as $sql) {
             $sql = trim($sql);
             if (strlen($sql) > 0) {
-                $this->logger->verbose($sql . $delimiter);
-
-                if ($this->dryRun == false) {
-                    $this->adapter->exec($sql);
-                }
+                $this->adapter->exec($sql);
             }
         }
     }

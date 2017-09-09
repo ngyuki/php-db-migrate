@@ -22,7 +22,7 @@ class PdoMySqlAdapterTest extends \PHPUnit_Framework_TestCase
         $env = TestEnv::create();
         $env->clear();
 
-        $this->adapter = new PdoMySqlAdapter($env->pdo(), $env->logger());
+        $this->adapter = new PdoMySqlAdapter($env->pdo(), $env->logger(), false);
         $this->pdo = $env->pdo();
     }
 

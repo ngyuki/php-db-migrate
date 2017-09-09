@@ -1,31 +1,17 @@
 <?php
 namespace ngyuki\DbMigrate\Executor;
 
-use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\MigrateContext;
 
 class PhpExecutor implements ExecutorInterface
-{
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
+{   /**
      * @var MigrateContext
      */
     private $context;
 
-    /**
-     * @var bool
-     */
-    private $dryRun;
-
-    public function __construct(Logger $logger, MigrateContext $context, $dryRun)
+    public function __construct(MigrateContext $context)
     {
-        $this->logger = $logger;
         $this->context = $context;
-        $this->dryRun = $dryRun;
     }
 
     public function up($content)
@@ -79,10 +65,6 @@ class PhpExecutor implements ExecutorInterface
 
     private function execute(\Closure $func)
     {
-        $this->logger->verbose("execute php script...");
-
-        if ($this->dryRun == false) {
-            call_user_func($func, $this->context);
-        }
+        call_user_func($func, $this->context);
     }
 }

@@ -10,14 +10,15 @@ class AdapterFactory
     /**
      * @param PDO $pdo
      * @param Logger $logger
+     * @param bool $dryRun
      * @return AdapterInterface
      */
-    public function create(PDO $pdo, Logger $logger)
+    public function create(PDO $pdo, Logger $logger, $dryRun)
     {
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
         if ($driver === 'mysql') {
-            return new PdoMySqlAdapter($pdo, $logger);
+            return new PdoMySqlAdapter($pdo, $logger, $dryRun);
         }
 
         throw new RuntimeException("PDO($driver) does not support");

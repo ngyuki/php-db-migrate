@@ -30,35 +30,29 @@ class Migrator
     private $scriptDirectory;
 
     /**
-     * @var boolean
-     */
-    private $dryRun = false;
-
-    /**
      * @param Logger $logger
      * @param Config $config
      * @return self
      */
     public static function create(Logger $logger, Config $config)
     {
-        $adapter = (new AdapterFactory())->create($config->pdo, $logger);
+        $adapter = (new AdapterFactory())->create($config->pdo, $logger, $config->dryRun);
 
         $context = new MigrateContext($config, $logger, $adapter);
 
         $executor = new ExecutorManager($config->workingDirectory);
-        $executor->add('.php', new PhpExecutor($logger, $context, $config->dryRun));
-        $executor->add('.sql', new SqlExecutor($logger, $adapter, $config->dryRun));
+        $executor->add('.php', new PhpExecutor($context));
+        $executor->add('.sql', new SqlExecutor($adapter));
 
-        return new Migrator($logger, $adapter, $executor, $config->scriptDirectory, $config->dryRun);
+        return new Migrator($logger, $adapter, $executor, $config->scriptDirectory);
     }
 
-    public function __construct(Logger $logger, AdapterInterface $adapter, ExecutorManager $executor, $scriptDirectory, $dryRun)
+    public function __construct(Logger $logger, AdapterInterface $adapter, ExecutorManager $executor, $scriptDirectory)
     {
         $this->logger = $logger;
         $this->adapter = $adapter;
         $this->executor = $executor;
         $this->scriptDirectory = $scriptDirectory;
-        $this->dryRun = $dryRun;
     }
 
     /**
@@ -164,9 +158,7 @@ class Migrator
             if ($migration->hasContent()) {
                 $this->logger->log("down: $version");
                 $this->executor->down($version, $migration->getContent());
-                if ($this->dryRun == false) {
-                    $this->adapter->delete($version);
-                }
+                $this->adapter->delete($version);
             } else {
                 $this->logger->log("unable down: $version (missing)");
             }
@@ -176,9 +168,7 @@ class Migrator
             if ($migration->hasContent()) {
                 $this->logger->log("up: $version");
                 $this->executor->up($version, $migration->getContent());
-                if ($this->dryRun == false) {
-                    $this->adapter->save($version, $migration->getContent());
-                }
+                $this->adapter->save($version, $migration->getContent());
             } else {
                 $this->logger->log("unable up: $version (missing)");
             }
@@ -303,9 +293,7 @@ class Migrator
         } elseif ($status->hasContent() == false) {
             $this->logger->log("set version: $version is missing");
         } else {
-            if ($this->dryRun == false) {
-                $this->adapter->save($version, $status->getContent());
-            }
+            $this->adapter->save($version, $status->getContent());
             $this->logger->log("set version: $version");
         }
     }
@@ -320,9 +308,7 @@ class Migrator
             } elseif ($status->hasContent() == false) {
                 $this->logger->log("set version: $version is missing");
             } else {
-                if ($this->dryRun == false) {
-                    $this->adapter->save($version, $status->getContent());
-                }
+                $this->adapter->save($version, $status->getContent());
                 $this->logger->log("set version: $version");
             }
         }
@@ -344,9 +330,7 @@ class Migrator
         if ($status->isApplied() == false) {
             $this->logger->log("version not migrated: $version");
         } else {
-            if ($this->dryRun == false) {
-                $this->adapter->delete($version);
-            }
+            $this->adapter->delete($version);
             $this->logger->log("unset version: $version");
         }
     }
@@ -357,9 +341,7 @@ class Migrator
 
         foreach ($statuses as $version => $status) {
             if ($status->isApplied()) {
-                if ($this->dryRun == false) {
-                    $this->adapter->delete($version);
-                }
+                $this->adapter->delete($version);
                 $this->logger->log("unset version: $version");
             }
         }
@@ -367,11 +349,7 @@ class Migrator
 
     public function clear()
     {
-        if ($this->dryRun) {
-            $this->logger->log("clear database ... dry run");
-        } else {
-            $this->adapter->clear();
-            $this->logger->log("clear database");
-        }
+        $this->adapter->clear();
+        $this->logger->log("clear database");
     }
 }

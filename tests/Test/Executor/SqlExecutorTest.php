@@ -3,7 +3,6 @@ namespace Test\Migrate;
 
 use PDO;
 use TestHelper\TestEnv;
-use ngyuki\DbMigrate\Migrate\Config;
 use ngyuki\DbMigrate\Executor\SqlExecutor;
 use ngyuki\DbMigrate\Adapter\AdapterFactory;
 use ngyuki\DbMigrate\Adapter\AdapterInterface;
@@ -21,11 +20,6 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
     private $pdo;
 
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
      * @var AdapterInterface
      */
     private $adapter;
@@ -34,12 +28,11 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
     {
         $this->env = new TestEnv();
         $this->pdo = $this->env->pdo();
-        $this->config = $this->env->config();
 
         $this->pdo->query("drop table if exists tt");
         $this->pdo->query("create table tt (id int not null primary key)");
 
-        $this->adapter = (new AdapterFactory())->create($this->pdo, $this->env->logger());
+        $this->adapter = (new AdapterFactory())->create($this->pdo, $this->env->logger(), false);
     }
 
     private function fetch_list()
@@ -52,21 +45,10 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
      */
     public function execute_up()
     {
-        $executor = new SqlExecutor($this->env->logger(), $this->adapter, false);
+        $executor = new SqlExecutor($this->adapter);
         $executor->up($this->env->read('/ok/2000.sql'));
 
         assertEquals(array("2000"), $this->fetch_list());
-    }
-
-    /**
-     * @test
-     */
-    public function execute_up_dryRun()
-    {
-        $executor = new SqlExecutor($this->env->logger(), $this->adapter, true);
-        $executor->up($this->env->read('/ok/2000.sql'));
-
-        assertEmpty($this->fetch_list());
     }
 
     /**
@@ -76,22 +58,9 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
     {
         $this->pdo->query("insert into tt values ('2000')");
 
-        $executor = new SqlExecutor($this->env->logger(), $this->adapter, false);
+        $executor = new SqlExecutor($this->adapter);
         $executor->down($this->env->read('/ok/2000.sql'));
 
         assertEmpty($this->fetch_list());
-    }
-
-    /**
-     * @test
-     */
-    public function execute_down_dryRun()
-    {
-        $this->pdo->query("insert into tt values ('2000')");
-
-        $executor = new SqlExecutor($this->env->logger(), $this->adapter, true);
-        $executor->down($this->env->read('/ok/2000.sql'));
-
-        assertEquals(array('2000'), $this->fetch_list());
     }
 }

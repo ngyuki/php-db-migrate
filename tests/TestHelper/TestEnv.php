@@ -2,6 +2,7 @@
 namespace TestHelper;
 
 use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
+use ngyuki\DbMigrate\Migrate\Config;
 use ngyuki\DbMigrate\Migrate\MigrateContext;
 use PDO;
 use ngyuki\DbMigrate\Console\ConfigLoader;
@@ -68,10 +69,12 @@ class TestEnv
         return self::$pdo;
     }
 
+    /**
+     * @return Config
+     */
     public function config()
     {
-        $loader = new ConfigLoader();
-        return $loader->load($this->configFile());
+        return (new ConfigLoader())->load($this->configFile());
     }
 
     /**
@@ -90,7 +93,7 @@ class TestEnv
         return new MigrateContext(
             $this->config(),
             $this->logger(),
-            new PdoMySqlAdapter($this->pdo(), $this->logger())
+            new PdoMySqlAdapter($this->pdo(), $this->logger(), $this->config()->dryRun)
         );
     }
 

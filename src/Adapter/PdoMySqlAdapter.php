@@ -18,10 +18,16 @@ class PdoMySqlAdapter implements AdapterInterface
      */
     private $logger;
 
-    public function __construct(\PDO $pdo, Logger $logger)
+    /**
+     * @var bool
+     */
+    private $dryRun;
+
+    public function __construct(\PDO $pdo, Logger $logger, $dryRun)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
+        $this->dryRun = $dryRun;
     }
 
     private function quoteIdentity($name)
@@ -40,7 +46,10 @@ class PdoMySqlAdapter implements AdapterInterface
      */
     public function exec($sql)
     {
-        $this->pdo->exec($sql);
+        $this->logger->verbose($sql);
+        if (!$this->dryRun) {
+            $this->pdo->exec($sql);
+        }
     }
 
     public function createTable()
@@ -100,6 +109,10 @@ class PdoMySqlAdapter implements AdapterInterface
 
     public function save($version, $content)
     {
+        if ($this->dryRun) {
+            return;
+        }
+
         $this->createTable();
 
         $this->pdo->beginTransaction();
@@ -119,6 +132,10 @@ class PdoMySqlAdapter implements AdapterInterface
 
     public function delete($version)
     {
+        if ($this->dryRun) {
+            return;
+        }
+
         $this->createTable();
 
         $stmt = $this->pdo->prepare("delete from {$this->quotedTable()} where version = ?");
@@ -127,6 +144,10 @@ class PdoMySqlAdapter implements AdapterInterface
 
     public function clear()
     {
+        if ($this->dryRun) {
+            return;
+        }
+
         $database = $this->pdo->query('select database()')->fetchColumn();
         $quotedDatabase = $this->quoteIdentity($database);
         $this->pdo->exec("drop database if exists $quotedDatabase");

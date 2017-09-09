@@ -1,12 +1,9 @@
 <?php
 return array(
-    function (PDO $pdo) {
-        $stmt = $pdo->prepare("insert into tt values (?)");
-        for ($i=3000; $i<3100; $i++) {
-            $stmt->execute(array($i));
-        }
+    function (\ngyuki\DbMigrate\Migrate\MigrateContext $context) {
+        $context->getAdapter()->exec("insert into tt values (3000)");
     },
-    function (PDO $pdo) {
-        $pdo->query("delete from tt where id between 3000 and 3100");
+    function (\ngyuki\DbMigrate\Migrate\MigrateContext $context) {
+        $context->getAdapter()->exec("delete from tt where id = 3000");
     },
 );
