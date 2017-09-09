@@ -90,10 +90,12 @@ class TestEnv
      */
     public function context()
     {
+        $dryRun = false;
         return new MigrateContext(
             $this->config(),
             $this->logger(),
-            new PdoMySqlAdapter($this->pdo(), $this->logger(), false)
+            new PdoMySqlAdapter($this->pdo(), $this->logger(), $dryRun),
+            $dryRun
         );
     }
 

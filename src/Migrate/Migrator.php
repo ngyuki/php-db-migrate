@@ -39,7 +39,7 @@ class Migrator
     {
         $adapter = (new AdapterFactory())->create($config->pdo, $logger, $dryRun);
 
-        $context = new MigrateContext($config, $logger, $adapter);
+        $context = new MigrateContext($config, $logger, $adapter, $dryRun);
 
         $executor = new ExecutorManager($config->workingDirectory);
         $executor->add('.php', new PhpExecutor($context));
