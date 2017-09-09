@@ -9,7 +9,7 @@ class MigrateContext
 
     public function __construct(Config $config, Logger $logger, AdapterInterface $adapter, $dryRun)
     {
-        $this->instances = get_defined_vars();
+        $this->instances = get_defined_vars() + $config->toArray();
     }
 
     public function get($id)

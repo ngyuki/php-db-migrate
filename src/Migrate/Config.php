@@ -9,25 +9,10 @@ use Symfony\Component\Filesystem\Filesystem;
  * @property string   $scriptDirectory
  * @property string   $workingDirectory
  */
-class Config
+class Config extends \ArrayIterator
 {
     /**
-     * @var \PDO
-     */
-    protected $pdo;
-
-    /**
-     * @var string
-     */
-    protected $scriptDirectory;
-
-    /**
-     * @var string
-     */
-    protected $workingDirectory;
-
-    /**
-     * @param array  $cfg
+     * @param array $cfg
      * @param string $file
      */
     public function __construct(array $cfg, $file = '')
@@ -38,12 +23,12 @@ class Config
             'work_dir' => '',
         );
 
-        $this->pdo = $cfg['pdo'];
+        parent::__construct($cfg, self::ARRAY_AS_PROPS);
 
-        $this->scriptDirectory = rtrim($cfg['directory'], DIRECTORY_SEPARATOR);
+        $this->scriptDirectory = rtrim($this['directory'], DIRECTORY_SEPARATOR);
 
-        if (strlen($cfg['work_dir'])) {
-            $this->workingDirectory = $cfg['work_dir'];
+        if (strlen($this['work_dir'])) {
+            $this->workingDirectory = $this['work_dir'];
         } elseif (strlen($file)) {
             $this->workingDirectory = dirname($file);
         } else {
@@ -52,6 +37,11 @@ class Config
 
         $this->fixRelativePath();
         $this->validate();
+    }
+
+    public function toArray()
+    {
+        return $this->getArrayCopy();
     }
 
     protected function fixRelativePath()
@@ -68,24 +58,6 @@ class Config
     {
         if ($this->pdo instanceof \PDO === false) {
             throw new \RuntimeException('Should be PDO is pdo.');
-        }
-    }
-
-    public function __get($name)
-    {
-        if (property_exists($this, $name) == false) {
-            throw new \LogicException("undefined property $name");
-        } else {
-            return $this->$name;
-        }
-    }
-
-    public function __set($name, $value)
-    {
-        if (property_exists($this, $name) == false) {
-            throw new \LogicException("undefined property $name");
-        } else {
-            $this->$name = $value;
         }
     }
 }

@@ -5,6 +5,10 @@ use ngyuki\DbMigrate\Migrate\Config;
 
 class ConfigLoader
 {
+    /**
+     * @param string $path
+     * @return Config
+     */
     public function load($path)
     {
         if (strlen($path) === 0) {
