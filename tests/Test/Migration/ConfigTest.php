@@ -34,13 +34,11 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $cfg = array(
             'pdo' => $this->pdo,
-            'args' => $args,
         );
 
         $config = new Config($cfg, __FILE__);
 
         assertThat($config->pdo, isInstanceOf('PDO'));
-        assertThat($config->args, identicalTo($args));
     }
 
     /**
@@ -51,21 +49,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function validate_no_Adapter()
     {
         $cfg = array();
-
-        new Config($cfg, __FILE__);
-    }
-
-    /**
-     * @test
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Should be array is args.
-     */
-    public function validate_no_array_in_args()
-    {
-        $cfg = array(
-            'pdo' => $this->pdo,
-            'args' => new \stdClass(),
-        );
 
         new Config($cfg, __FILE__);
     }

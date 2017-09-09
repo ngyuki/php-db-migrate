@@ -6,10 +6,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @property PDO      $pdo
- * @property array    $args
  * @property string   $scriptDirectory
  * @property string   $workingDirectory
- * @property boolean  $dryRun
  */
 class Config
 {
@@ -17,11 +15,6 @@ class Config
      * @var \PDO
      */
     protected $pdo;
-
-    /**
-     * @var array
-     */
-    protected $args;
 
     /**
      * @var string
@@ -34,11 +27,6 @@ class Config
     protected $workingDirectory;
 
     /**
-     * @var boolean
-     */
-    protected $dryRun;
-
-    /**
      * @param array  $cfg
      * @param string $file
      */
@@ -46,14 +34,12 @@ class Config
     {
         $cfg += array(
             'pdo' => null,
-            'args' => array(),
             'directory' => 'migrate',
             'work_dir' => '',
         );
 
         $this->pdo = $cfg['pdo'];
 
-        $this->args = $cfg['args'];
         $this->scriptDirectory = rtrim($cfg['directory'], DIRECTORY_SEPARATOR);
 
         if (strlen($cfg['work_dir'])) {
@@ -82,10 +68,6 @@ class Config
     {
         if ($this->pdo instanceof \PDO === false) {
             throw new \RuntimeException('Should be PDO is pdo.');
-        }
-
-        if (!is_array($this->args)) {
-            throw new \RuntimeException('Should be array is args.');
         }
     }
 

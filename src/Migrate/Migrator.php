@@ -32,11 +32,12 @@ class Migrator
     /**
      * @param Logger $logger
      * @param Config $config
-     * @return self
+     * @param bool $dryRun
+     * @return Migrator
      */
-    public static function create(Logger $logger, Config $config)
+    public static function create(Logger $logger, Config $config, $dryRun)
     {
-        $adapter = (new AdapterFactory())->create($config->pdo, $logger, $config->dryRun);
+        $adapter = (new AdapterFactory())->create($config->pdo, $logger, $dryRun);
 
         $context = new MigrateContext($config, $logger, $adapter);
 

@@ -44,8 +44,7 @@ abstract class AbstractCommand extends Command
 
         $loader = new ConfigLoader();
         $config = $loader->load($configPath);
-        $config->dryRun = $dryRun;
 
-        $this->migrator = Migrator::create(new Logger($output), $config);
+        $this->migrator = Migrator::create(new Logger($output), $config, $dryRun);
     }
 }

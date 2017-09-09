@@ -34,7 +34,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
         $this->env = new TestEnv();
         $this->config = $this->env->config();
         $this->pdo = $this->env->pdo();
-        $this->manager = Migrator::create($this->env->logger(), $this->config);
+        $this->manager = Migrator::create($this->env->logger(), $this->config, false);
 
         $this->env->clear();
     }
@@ -100,8 +100,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_dryRun()
     {
-        $this->config->dryRun = true;
-        $this->manager = Migrator::create($this->env->logger(), $this->config);
+        $this->manager = Migrator::create($this->env->logger(), $this->config, true);
 
         $this->manager->migrate();
 
@@ -178,7 +177,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     public function migrate_error()
     {
         $this->config->scriptDirectory = $this->env->files('err');
-        $this->manager = Migrator::create($this->env->logger(), $this->config);
+        $this->manager = Migrator::create($this->env->logger(), $this->config, false);
 
         try {
             $this->manager->migrate();
@@ -276,8 +275,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager->up();
 
-        $this->config->dryRun = true;
-        $this->manager = Migrator::create($this->env->logger(), $this->config);
+        $this->manager = Migrator::create($this->env->logger(), $this->config, true);
 
         $roes = $this->env->versions();
         assertCount(1, $roes);
