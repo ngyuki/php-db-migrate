@@ -32,8 +32,7 @@ class PdoMySqlAdapter implements AdapterInterface
 
     private function quoteIdentity($name)
     {
-        // @todo escape
-        return '`' . $name . '`';
+        return '`' . strtr($name, '`', '``') . '`';
     }
 
     private function quotedTable()
