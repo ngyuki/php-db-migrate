@@ -1,19 +1,29 @@
 version: '3'
 
 services:
+  mysql:
+    image: mysql
+    ports:
+      - $MYSQL_PORT:3306
+    environment: &environment
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+
   php:
-    build: ./
+    image: ngyuki/php-dev:7.0-alpine
     volumes:
       - ./:/app/
     working_dir: /app/
-    environment: &mysql
-      MYSQL_HOST: mysql
-      MYSQL_DATABASE: test
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-
-  mysql:
-    image: mysql
     environment:
-      <<: *mysql
+      <<: *environment
+    command:
+      - sh
+      - -c
+      - |
+        composer install -o --ansi --prefer-dist
+        php -v
+        tail -f /dev/null

@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<phpunit bootstrap="./tests/bootstrap.php">
-    <php>
-        <env name="MYSQL_HOST" value="localhost" />
-        <env name="MYSQL_PORT" value="3306" />
-        <env name="MYSQL_USER" value="migrate" />
-        <env name="MYSQL_PASSWORD" value="password" />
-        <env name="MYSQL_DATABASE" value="migrate" />
-    </php>
+<phpunit bootstrap="tests/bootstrap.php" colors="true">
     <testsuites>
-        <testsuite name="tests">
-            <directory>./tests/</directory>
+        <testsuite>
+            <directory>tests/</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
-            <directory suffix=".php">./src/</directory>
+            <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
 </phpunit>
