@@ -25,9 +25,9 @@ class Migrator
     private $executor;
 
     /**
-     * @var string
+     * @var MigrationCollector
      */
-    private $scriptDirectory;
+    private $collector;
 
     /**
      * @param Logger $logger
@@ -45,72 +45,21 @@ class Migrator
         $executor->add('.php', new PhpExecutor($context));
         $executor->add('.sql', new SqlExecutor($adapter));
 
-        return new Migrator($logger, $adapter, $executor, $config->scriptDirectory);
+        $collector = new MigrationCollector($adapter, $config->scriptDirectory);
+
+        return new Migrator($logger, $adapter, $executor, $collector);
     }
 
-    public function __construct(Logger $logger, AdapterInterface $adapter, ExecutorManager $executor, $scriptDirectory)
-    {
+    public function __construct(
+        Logger $logger,
+        AdapterInterface $adapter,
+        ExecutorManager $executor,
+        MigrationCollector $collector
+    ) {
         $this->logger = $logger;
         $this->adapter = $adapter;
         $this->executor = $executor;
-        $this->scriptDirectory = $scriptDirectory;
-    }
-
-    /**
-     * @param string|null $directory
-     * @return array
-     */
-    private function listScripts($directory = null)
-    {
-        if ($directory === null) {
-            $directory = $this->scriptDirectory;
-        }
-
-        $list = array();
-
-        foreach (new \DirectoryIterator($directory) as $file) {
-            /* @var $file \SplFileInfo */
-            if (!$file->isFile()) {
-                continue;
-            }
-
-            $fn = $file->getFilename();
-
-            if (preg_match("/^[-._a-zA-Z0-9]+$/", $fn) === 0) {
-                continue;
-            }
-
-            $list[$fn] = $file->getRealPath();
-        }
-
-        ksort($list);
-        return $list;
-    }
-
-    private function getStatuses()
-    {
-        $scripts = $this->listScripts();
-        $versions = $this->adapter->fetchAll();
-
-        /** @var $statuses Status[] */
-        $statuses = array();
-
-        foreach ($scripts as $version => $script) {
-            $statuses[$version] = new Status($version);
-            $statuses[$version]->setScript($script);
-        }
-
-        foreach ($versions as $version => $row) {
-            if (array_key_exists($version, $statuses) === false) {
-                $statuses[$version] = new Status($version);
-            }
-
-            $statuses[$version]->setApplied(true);
-            $statuses[$version]->setContent($row['content']);
-        }
-
-        ksort($statuses);
-        return $statuses;
+        $this->collector = $collector;
     }
 
     /**
@@ -118,7 +67,7 @@ class Migrator
      */
     public function showStatus()
     {
-        $statuses = $this->getStatuses();
+        $statuses = $this->collector->listStatuses();
 
         if (count($statuses) == 0) {
             $this->logger->log("migrate nothing");
@@ -195,7 +144,7 @@ class Migrator
      */
     public function migrate($target = null)
     {
-        $migrations = $this->getStatuses();
+        $migrations = $this->collector->listStatuses();
 
         $up = array();
         $down = array();
@@ -229,7 +178,7 @@ class Migrator
 
     public function up()
     {
-        $migrations = $this->getStatuses();
+        $migrations = $this->collector->listStatuses();
 
         $up = array();
 
@@ -245,7 +194,7 @@ class Migrator
 
     public function down()
     {
-        $migrations = $this->getStatuses();
+        $migrations = $this->collector->listStatuses();
 
         $down = array();
 
@@ -266,7 +215,7 @@ class Migrator
      */
     public function exec($directory)
     {
-        $scripts = $this->listScripts($directory);
+        $scripts = $this->collector->listScripts($directory);
 
         foreach ($scripts as $name => $script) {
             $migration = new Status($name);
@@ -281,7 +230,7 @@ class Migrator
      */
     public function markVersion($version)
     {
-        $statuses = $this->getStatuses();
+        $statuses = $this->collector->listStatuses();
 
         if (array_key_exists($version, $statuses) === false) {
             throw new \RuntimeException("version not found: $version");
@@ -301,7 +250,7 @@ class Migrator
 
     public function markAllVersions()
     {
-        $statuses = $this->getStatuses();
+        $statuses = $this->collector->listStatuses();
 
         foreach ($statuses as $version => $status) {
             if ($status->isApplied()) {
@@ -320,7 +269,7 @@ class Migrator
      */
     public function unmarkVersion($version)
     {
-        $statuses = $this->getStatuses();
+        $statuses = $this->collector->listStatuses();
 
         if (array_key_exists($version, $statuses) === false) {
             throw new \RuntimeException("version not found: $version");
@@ -338,7 +287,7 @@ class Migrator
 
     public function unmarkAllVersions()
     {
-        $statuses = $this->getStatuses();
+        $statuses = $this->collector->listStatuses();
 
         foreach ($statuses as $version => $status) {
             if ($status->isApplied()) {
