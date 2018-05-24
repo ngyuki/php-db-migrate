@@ -15,6 +15,6 @@ class UpCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->migrator->up();
+        $this->locator->migrator->up();
     }
 }

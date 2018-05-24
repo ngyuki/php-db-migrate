@@ -14,6 +14,6 @@ class StatusCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->migrator->showStatus();
+        $this->locator->reporter->show();
     }
 }

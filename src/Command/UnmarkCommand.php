@@ -33,9 +33,9 @@ class UnmarkCommand extends AbstractCommand
         }
 
         if ($all) {
-            $this->migrator->unmarkAllVersions();
+            $this->locator->migrator->unmarkAllVersions();
         } elseif (strlen($version)) {
-            $this->migrator->unmarkVersion($version);
+            $this->locator->migrator->unmarkVersion($version);
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
         }

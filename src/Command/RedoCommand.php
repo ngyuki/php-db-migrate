@@ -15,7 +15,7 @@ class RedoCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->migrator->down();
-        $this->migrator->up();
+        $this->locator->migrator->down();
+        $this->locator->migrator->up();
     }
 }

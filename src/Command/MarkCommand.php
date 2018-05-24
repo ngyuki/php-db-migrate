@@ -33,9 +33,9 @@ class MarkCommand extends AbstractCommand
         }
 
         if ($all) {
-            $this->migrator->markAllVersions();
+            $this->locator->migrator->markAllVersions();
         } elseif (strlen($version)) {
-            $this->migrator->markVersion($version);
+            $this->locator->migrator->markVersion($version);
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
         }

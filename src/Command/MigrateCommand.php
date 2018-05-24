@@ -18,6 +18,6 @@ class MigrateCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $target = $input->getArgument('target');
-        $this->migrator->migrate($target);
+        $this->locator->migrator->migrate($target);
     }
 }

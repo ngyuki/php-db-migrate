@@ -1,11 +1,8 @@
 <?php
 namespace ngyuki\DbMigrate\Migrate;
 
-use ngyuki\DbMigrate\Adapter\AdapterFactory;
 use ngyuki\DbMigrate\Adapter\AdapterInterface;
 use ngyuki\DbMigrate\Executor\ExecutorManager;
-use ngyuki\DbMigrate\Executor\PhpExecutor;
-use ngyuki\DbMigrate\Executor\SqlExecutor;
 
 class Migrator
 {
@@ -29,27 +26,6 @@ class Migrator
      */
     private $collector;
 
-    /**
-     * @param Logger $logger
-     * @param Config $config
-     * @param bool $dryRun
-     * @return Migrator
-     */
-    public static function create(Logger $logger, Config $config, $dryRun)
-    {
-        $adapter = (new AdapterFactory())->create($config->pdo, $logger, $dryRun);
-
-        $context = new MigrateContext($config, $logger, $adapter, $dryRun);
-
-        $executor = new ExecutorManager($config->workingDirectory);
-        $executor->add('.php', new PhpExecutor($context));
-        $executor->add('.sql', new SqlExecutor($adapter));
-
-        $collector = new MigrationCollector($adapter, $config->scriptDirectory);
-
-        return new Migrator($logger, $adapter, $executor, $collector);
-    }
-
     public function __construct(
         Logger $logger,
         AdapterInterface $adapter,
@@ -60,38 +36,6 @@ class Migrator
         $this->adapter = $adapter;
         $this->executor = $executor;
         $this->collector = $collector;
-    }
-
-    /**
-     * マイグレーションの状態を表示
-     */
-    public function showStatus()
-    {
-        $statuses = $this->collector->listStatuses();
-
-        if (count($statuses) == 0) {
-            $this->logger->log("migrate nothing");
-            return 0;
-        }
-
-        $code = 0;
-
-        foreach ($statuses as $version => $status) {
-            if ($status->isMissing()) {
-                $suffix = " (missing)";
-            } else {
-                $suffix = "";
-            }
-
-            if ($status->isApplied()) {
-                $this->logger->log("* {$version}{$suffix}");
-            } else {
-                $this->logger->log("  {$version}{$suffix}");
-                $code = 1;
-            }
-        }
-
-        return $code;
     }
 
     /**
