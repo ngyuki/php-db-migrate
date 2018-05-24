@@ -184,7 +184,7 @@ class Migrator
 
         if ($status->isApplied()) {
             $this->logger->log("version already migrated: $version");
-        } elseif ($status->hasContent() == false) {
+        } elseif ($status->isMissing()) {
             $this->logger->log("mark version: $version is missing");
         } else {
             $this->adapter->save($version, $status->getContent());
@@ -199,8 +199,8 @@ class Migrator
         foreach ($statuses as $version => $status) {
             if ($status->isApplied()) {
                 // skip
-            } elseif ($status->hasContent() == false) {
-                $this->logger->log("mark version: $version is missing");
+            } elseif ($status->isMissing()) {
+                // skip
             } else {
                 $this->adapter->save($version, $status->getContent());
                 $this->logger->log("mark version: $version");

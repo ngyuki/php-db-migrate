@@ -1,6 +1,8 @@
 <?php
 namespace ngyuki\DbMigrate\Migrate;
 
+use Guzzle\Common\Exception\RuntimeException;
+
 class Status
 {
     /**
@@ -61,10 +63,14 @@ class Status
     {
         if ($this->source === null) {
             if ($this->script !== null) {
-                $this->source = file_get_contents($this->script);
+                $source = file_get_contents($this->script);
+                if ($source === false) {
+                    throw new RuntimeException("Unable read \"$this->script\"");
+                }
+                $this->source = $source;
             };
         }
-        if ($this->source !== false && $this->source !== null) {
+        if ($this->source !== null) {
             return $this->source;
         } else {
             return $this->content;
