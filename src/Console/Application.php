@@ -26,8 +26,8 @@ class Application extends BaseApplication
         $commands[] = new Command\DownCommand();
         $commands[] = new Command\RedoCommand();
         $commands[] = new Command\StatusCommand();
-        $commands[] = new Command\SetCommand();
-        $commands[] = new Command\UnsetCommand();
+        $commands[] = new Command\MarkCommand();
+        $commands[] = new Command\UnmarkCommand();
         $commands[] = new Command\ExecCommand();
         $commands[] = new Command\ClearCommand();
 

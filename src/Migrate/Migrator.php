@@ -279,7 +279,7 @@ class Migrator
     /**
      * @param string $version
      */
-    public function setVersion($version)
+    public function markVersion($version)
     {
         $statuses = $this->getStatuses();
 
@@ -292,14 +292,14 @@ class Migrator
         if ($status->isApplied()) {
             $this->logger->log("version already migrated: $version");
         } elseif ($status->hasContent() == false) {
-            $this->logger->log("set version: $version is missing");
+            $this->logger->log("mark version: $version is missing");
         } else {
             $this->adapter->save($version, $status->getContent());
-            $this->logger->log("set version: $version");
+            $this->logger->log("mark version: $version");
         }
     }
 
-    public function setAllVersions()
+    public function markAllVersions()
     {
         $statuses = $this->getStatuses();
 
@@ -307,10 +307,10 @@ class Migrator
             if ($status->isApplied()) {
                 // skip
             } elseif ($status->hasContent() == false) {
-                $this->logger->log("set version: $version is missing");
+                $this->logger->log("mark version: $version is missing");
             } else {
                 $this->adapter->save($version, $status->getContent());
-                $this->logger->log("set version: $version");
+                $this->logger->log("mark version: $version");
             }
         }
     }
@@ -318,7 +318,7 @@ class Migrator
     /**
      * @param string $version
      */
-    public function unsetVersion($version)
+    public function unmarkVersion($version)
     {
         $statuses = $this->getStatuses();
 
@@ -332,18 +332,18 @@ class Migrator
             $this->logger->log("version not migrated: $version");
         } else {
             $this->adapter->delete($version);
-            $this->logger->log("unset version: $version");
+            $this->logger->log("unmark version: $version");
         }
     }
 
-    public function unsetAllVersions()
+    public function unmarkAllVersions()
     {
         $statuses = $this->getStatuses();
 
         foreach ($statuses as $version => $status) {
             if ($status->isApplied()) {
                 $this->adapter->delete($version);
-                $this->logger->log("unset version: $version");
+                $this->logger->log("unmark version: $version");
             }
         }
     }

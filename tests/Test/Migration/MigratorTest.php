@@ -45,7 +45,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     public function migrate_nothing()
     {
         // すべてのバージョンが適用済とする
-        $this->manager->setAllVersions();
+        $this->manager->markAllVersions();
 
         // すべてのバージョンがテーブルに記録されている
         $list = $this->env->versions();
@@ -116,7 +116,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
      */
     public function exec_()
     {
-        $this->manager->setAllVersions();
+        $this->manager->markAllVersions();
         $prev = $this->env->versions();
 
         $this->manager->exec($this->env->files('ok2'));
@@ -133,7 +133,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_delete_record()
     {
-        $this->manager->setAllVersions();
+        $this->manager->markAllVersions();
 
         // マイグレーションのレコードを削除する
         $this->env->delete(null);
@@ -154,7 +154,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_part()
     {
-        $this->manager->setAllVersions();
+        $this->manager->markAllVersions();
 
         // 2000.sql と 3000.php をマイグレーションテーブルから削除する
         $this->env->delete(array('2000.sql', '3000.php'));
@@ -197,9 +197,9 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function set_all_versions()
+    public function mark_all_versions()
     {
-        $this->manager->setAllVersions();
+        $this->manager->markAllVersions();
 
         $list = $this->env->versions();
         assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $list);
@@ -208,10 +208,10 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function unset_all_versions()
+    public function unmark_all_versions()
     {
-        $this->manager->setAllVersions();
-        $this->manager->unsetAllVersions();
+        $this->manager->markAllVersions();
+        $this->manager->unmarkAllVersions();
 
         $list = $this->env->versions();
         assertEquals(array(), $list);
@@ -226,12 +226,12 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
 
         assertEquals(array('1000.sql'), $this->env->versions());
 
-        $this->manager->setVersion('3000.php');
+        $this->manager->markVersion('3000.php');
         $this->manager->up();
 
         assertEquals(array('1000.sql', '2000.sql', '3000.php'), $this->env->versions());
 
-        $this->manager->unsetVersion('2000.sql');
+        $this->manager->unmarkVersion('2000.sql');
         $this->manager->down();
 
         assertEquals(array('1000.sql'), $this->env->versions());

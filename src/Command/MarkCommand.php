@@ -6,16 +6,19 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UnsetCommand extends AbstractCommand
+class MarkCommand extends AbstractCommand
 {
     protected function configure()
     {
         parent::configure();
 
-        $this->setName('unset')->setDescription('Unset version')
-            ->addOption('all', '', InputOption::VALUE_NONE, 'Unset all versions')
-            ->addArgument('version', InputArgument::OPTIONAL, 'Unset specific version')
+        $this->setName('mark')->setDescription('Mark migrated version')
+            ->addOption('all', '', InputOption::VALUE_NONE, 'Mark all versions')
+            ->addArgument('version', InputArgument::OPTIONAL, 'Mark specific version')
         ;
+
+        // Backward Compatibility for v0.2.0
+        $this->setAliases(['set']);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -30,9 +33,9 @@ class UnsetCommand extends AbstractCommand
         }
 
         if ($all) {
-            $this->migrator->unsetAllVersions();
+            $this->migrator->markAllVersions();
         } elseif (strlen($version)) {
-            $this->migrator->unsetVersion($version);
+            $this->migrator->markVersion($version);
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
         }

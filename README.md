@@ -167,13 +167,13 @@ down: 20140829-02.sql
 up: 20140829-02.sql
 ```
 
-### `db-migrate set`
+### `db-migrate mark`
 
 マイグレーションが適用済であるとマークします。引数としてスクリプトのファイル名を指定します。
 
 ```console
-$ vendor/bin/db-migrate set 20140828-01.sql
-set version: 20140828-01.sql
+$ vendor/bin/db-migrate mark 20140828-01.sql
+mark version: 20140828-01.sql
 ```
 
 なんらかの原因でマイグレーションが失敗したときに、手作業でマイグレーションを行った後に失敗したスクリプトを適用済であるとマークするために使用できます。
@@ -181,32 +181,32 @@ set version: 20140828-01.sql
 引数として `--all` を付けるとすべてのスクリプトが適用済であるとマークされます。
 
 ```console
-$ vendor/bin/db-migrate set --all
-set version: 20140828-01.sql
-set version: 20140829-01.sql
-set version: 20140829-02.sql
-set version: 20140830-01.php
-set version: 20140830-02.sql
+$ vendor/bin/db-migrate mark --all
+mark version: 20140828-01.sql
+mark version: 20140829-01.sql
+mark version: 20140829-02.sql
+mark version: 20140830-01.php
+mark version: 20140830-02.sql
 ```
 
-### `db-migrate unset`
+### `db-migrate unmark`
 
 マイグレーションが未適用であるとマークします。引数としてスクリプトのファイル名を指定します。
 
 ```console
-$ vendor/bin/db-migrate unset 20140828-01.sql
-unset version: 20140828-01.sql
+$ vendor/bin/db-migrate unmark 20140828-01.sql
+unmark version: 20140828-01.sql
 ```
 
 引数として `--all` を付けるとすべてのスクリプトが未適用であるとマークされます。
 
 ```console
-$ vendor/bin/db-migrate unset --all
-unset version: 20140828-01.sql
-unset version: 20140829-01.sql
-unset version: 20140829-02.sql
-unset version: 20140830-01.php
-unset version: 20140830-02.sql
+$ vendor/bin/db-migrate unmark --all
+unmark version: 20140828-01.sql
+unmark version: 20140829-01.sql
+unmark version: 20140829-02.sql
+unmark version: 20140830-01.php
+unmark version: 20140830-02.sql
 ```
 
 ### `db-migrate exec`
