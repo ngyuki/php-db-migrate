@@ -1,9 +1,12 @@
 <?php
 namespace Test\Migrate;
 
+use ngyuki\DbMigrate\Console\ConfigLoader;
+use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\ServiceLocator;
 use PDO;
 use PDOException;
+use Symfony\Component\Console\Output\NullOutput;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Migrate\Config;
 
@@ -32,7 +35,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->env = new TestEnv();
-        $this->config = $this->env->config();
+        $this->config =  (new ConfigLoader())->load(__DIR__ . '/_files');
         $this->pdo = $this->env->pdo();
 
         $this->initServiceLocator();
@@ -42,7 +45,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
 
     public function initServiceLocator($dryRun = false)
     {
-        $this->locator = new ServiceLocator($this->env->logger(), $this->config, $dryRun);
+        $this->locator = new ServiceLocator(new Logger(new NullOutput()), $this->config, $dryRun);
     }
 
     /**
@@ -125,7 +128,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
         $this->locator->migrator->markAllVersions();
         $prev = $this->env->versions();
 
-        $this->locator->migrator->exec($this->env->files('ok2'));
+        $this->locator->migrator->exec(__DIR__ . '/_files/ok2');
 
         $rows = $this->pdo->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
         assertEquals(array(1, 2), $rows);
@@ -182,7 +185,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_error()
     {
-        $this->config->scriptDirectory = $this->env->files('err');
+        $this->config->scriptDirectory = __DIR__ . '/_files/err';
         $this->initServiceLocator();
 
         try {

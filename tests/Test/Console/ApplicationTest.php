@@ -1,6 +1,7 @@
 <?php
 namespace Test\Console;
 
+use PDO;
 use TestHelper\TestEnv;
 use TestHelper\ApplicationTester;
 use ngyuki\DbMigrate\Console\Application;
@@ -13,26 +14,27 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     private $env;
 
     /**
-     * @var Application
-     */
-    private $app;
-
-    /**
      * @var ApplicationTester
      */
     private $tester;
 
+    /**
+     * @var string
+     */
+    private $config;
+
     public function setUp()
     {
         $this->env = new TestEnv();
-
         $this->env->clear();
 
-        $this->app = new Application();
-        $this->app->setCatchExceptions(false);
-        $this->app->setAutoExit(false);
+        $app = new Application();
+        $app->setCatchExceptions(false);
+        $app->setAutoExit(false);
 
-        $this->tester = new ApplicationTester($this->app);
+        $this->tester = new ApplicationTester($app);
+
+        $this->config = __DIR__ . '/_files';
     }
 
     /**
@@ -40,8 +42,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function status_()
     {
-        $fn = $this->env->files();
-        $this->tester->run('status', '--config', $fn);
+        $this->tester->run('status', '--config', $this->config);
     }
 
     /**
@@ -49,10 +50,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function migrate_()
     {
-        $fn = $this->env->files();
-        $this->tester->run('migrate', '--config', $fn);
+        $this->tester->run('migrate', '--config', $this->config);
 
-        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->env->versions());
+        assertEquals(array("1000.sql", "3000.php", "9999.sql"), $this->env->versions());
     }
 
     /**
@@ -60,11 +60,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function up_down_()
     {
-        $fn = $this->env->files();
-        $this->tester->run('up', '--config', $fn);
+        $this->tester->run('up', '--config', $this->config);
         assertEquals(array("1000.sql"), $this->env->versions());
 
-        $this->tester->run('down', '--config', $fn);
+        $this->tester->run('down', '--config', $this->config);
         assertEquals(array(), $this->env->versions());
     }
 
@@ -73,9 +72,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function exec_()
     {
-        $fn = $this->env->files();
-        $dir = $this->env->files('ok');
-        $this->tester->run('exec', '--config', $fn, $dir);
+        $dir = __DIR__ . '/_files/migrations';
+        $this->tester->run('exec', '--config', $this->config, $dir);
     }
 
     /**
@@ -83,10 +81,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function set_all()
     {
-        $fn = $this->env->files();
-        $this->tester->run('set', '--all', '--config', $fn);
+        $this->tester->run('set', '--all', '--config', $this->config);
 
-        assertEquals(array("1000.sql", "2000.sql", "3000.php", "9999.sql"), $this->env->versions());
+        assertEquals(array("1000.sql", "3000.php", "9999.sql"), $this->env->versions());
     }
 
     /**
@@ -94,10 +91,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function set_one()
     {
-        $fn = $this->env->files();
-        $this->tester->run('set', '2000.sql', '--config', $fn);
+        $this->tester->run('set', '3000.php', '--config', $this->config);
 
-        assertEquals(array('2000.sql'), $this->env->versions());
+        assertEquals(array('3000.php'), $this->env->versions());
     }
 
     /**
@@ -107,8 +103,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function set_none()
     {
-        $fn = $this->env->files();
-        $this->tester->run('set', '--config', $fn);
+        $this->tester->run('set', '--config', $this->config);
     }
 
     /**
@@ -124,12 +119,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     public function set_too_many_args_data()
     {
-        $env = new TestEnv();
-        $fn = $env->files();
-
         return array(
-            array('set', '--config', $fn, '--all', 'version'),
-            array('set', '--config', $fn, '--all', 'version'),
+            array('set', '--config', $this->config, '--all', 'version'),
+            array('set', '--config', $this->config, '--all', 'version'),
         );
     }
 
@@ -138,9 +130,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function unset_all()
     {
-        $fn = $this->env->files();
-        $this->tester->run('set', '--config', $fn, '--all');
-        $this->tester->run('unset', '--config', $fn, '--all');
+        $this->tester->run('set', '--config', $this->config, '--all');
+        $this->tester->run('unset', '--config', $this->config, '--all');
 
         assertEmpty($this->env->versions());
     }
@@ -150,11 +141,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function unset_one()
     {
-        $fn = $this->env->files();
-        $this->tester->run('set', '--config', $fn, '--all');
-        $this->tester->run('unset', '--config', $fn, '2000.sql');
+        $this->tester->run('set', '--config', $this->config, '--all');
+        $this->tester->run('unset', '--config', $this->config, '3000.php');
 
-        assertNotContains('2000.sql', $this->env->versions());
+        assertNotContains('3000.php', $this->env->versions());
     }
 
     /**
@@ -162,7 +152,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function clear_()
     {
-        $fn = $this->env->files();
-        $this->tester->run('clear', '--config', $fn);
+        $this->tester->run('clear', '--config', $this->config);
     }
 }

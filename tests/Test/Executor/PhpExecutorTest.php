@@ -1,18 +1,17 @@
 <?php
 namespace Test\Migrate;
 
+use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
+use ngyuki\DbMigrate\Migrate\Config;
+use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\MigrateContext;
 use PDO;
+use Symfony\Component\Console\Output\NullOutput;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Executor\PhpExecutor;
 
 class PhpExecutorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TestEnv
-     */
-    private $env;
-
     /**
      * @var PDO
      */
@@ -25,12 +24,16 @@ class PhpExecutorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->env = new TestEnv();
-        $this->pdo = $this->env->pdo();
-        $this->context = $this->env->context();
+        $this->pdo = (new TestEnv())->pdo();
 
         $this->pdo->query("drop table if exists tt");
         $this->pdo->query("create table tt (id int not null primary key)");
+
+        $dryRun = false;
+        $logger = new Logger(new NullOutput());
+        $adapter = new PdoMySqlAdapter($this->pdo, $logger, $dryRun);
+
+        $this->context = new MigrateContext([], $logger, $adapter, $dryRun);
     }
 
     private function fetch_list()
@@ -44,7 +47,7 @@ class PhpExecutorTest extends \PHPUnit_Framework_TestCase
     public function execute_up()
     {
         $executor = new PhpExecutor($this->context);
-        $executor->up($this->env->read('/ok/3000.php'));
+        $executor->up(file_get_contents(__DIR__ . '/_files/exec.php'));
 
         assertEquals(array('3000'), $this->fetch_list());
     }
@@ -57,7 +60,7 @@ class PhpExecutorTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("insert into tt values ('3000')");
 
         $executor = new PhpExecutor($this->context);
-        $executor->down($this->env->read('/ok/3000.php'));
+        $executor->down(file_get_contents(__DIR__ . '/_files/exec.php'));
 
         assertEmpty($this->fetch_list());
     }

@@ -1,7 +1,9 @@
 <?php
 namespace Test\Migrate;
 
+use ngyuki\DbMigrate\Migrate\Logger;
 use PDO;
+use Symfony\Component\Console\Output\NullOutput;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Executor\SqlExecutor;
 use ngyuki\DbMigrate\Adapter\AdapterFactory;
@@ -9,11 +11,6 @@ use ngyuki\DbMigrate\Adapter\AdapterInterface;
 
 class SqlExecutorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TestEnv
-     */
-    private $env;
-
     /**
      * @var PDO
      */
@@ -26,13 +23,15 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->env = new TestEnv();
-        $this->pdo = $this->env->pdo();
+        $this->pdo = (new TestEnv())->pdo();
 
         $this->pdo->query("drop table if exists tt");
         $this->pdo->query("create table tt (id int not null primary key)");
 
-        $this->adapter = (new AdapterFactory())->create($this->pdo, $this->env->logger(), false);
+        $dryRun = false;
+        $logger = new Logger(new NullOutput());
+
+        $this->adapter = (new AdapterFactory())->create($this->pdo, $logger, $dryRun);
     }
 
     private function fetch_list()
@@ -46,7 +45,7 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
     public function execute_up()
     {
         $executor = new SqlExecutor($this->adapter);
-        $executor->up($this->env->read('/ok/2000.sql'));
+        $executor->up(file_get_contents(__DIR__ . '/_files/exec.sql'));
 
         assertEquals(array("2000"), $this->fetch_list());
     }
@@ -59,7 +58,7 @@ class SqlExecutorTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("insert into tt values ('2000')");
 
         $executor = new SqlExecutor($this->adapter);
-        $executor->down($this->env->read('/ok/2000.sql'));
+        $executor->down(file_get_contents(__DIR__ . '/_files/exec.sql'));
 
         assertEmpty($this->fetch_list());
     }

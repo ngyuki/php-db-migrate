@@ -2,12 +2,8 @@
 namespace TestHelper;
 
 use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
-use ngyuki\DbMigrate\Migrate\Config;
-use ngyuki\DbMigrate\Migrate\MigrateContext;
+use ngyuki\DbMigrate\Console\Configure;
 use PDO;
-use ngyuki\DbMigrate\Console\ConfigLoader;
-use ngyuki\DbMigrate\Migrate\Logger;
-use Symfony\Component\Console\Output\NullOutput;
 
 class TestEnv
 {
@@ -49,68 +45,16 @@ class TestEnv
             ->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    /**
+     * @return PDO
+     */
     public function pdo()
     {
         if (self::$pdo === null) {
-            $host = getenv('MYSQL_HOST');
-            $port = getenv('MYSQL_PORT');
-            $name = getenv('MYSQL_DATABASE');
-            $user = getenv('MYSQL_USER');
-            $pass = getenv('MYSQL_PASSWORD');
-
-            $dsn = sprintf("mysql:dbname=$name;host=$host;port=$port;charset=utf8");
-
-            self::$pdo = new PDO($dsn, $user, $pass, array(
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            ));
+            $config = (new Configure)->get();
+            self::$pdo = $config['pdo'];
         }
 
         return self::$pdo;
-    }
-
-    /**
-     * @return Config
-     */
-    public function config()
-    {
-        return (new ConfigLoader())->load($this->configFile());
-    }
-
-    /**
-     * @return Logger
-     */
-    public function logger()
-    {
-        return new Logger(new NullOutput());
-    }
-
-    /**
-     * @return MigrateContext
-     */
-    public function context()
-    {
-        $dryRun = false;
-        return new MigrateContext(
-            $this->config(),
-            $this->logger(),
-            new PdoMySqlAdapter($this->pdo(), $this->logger(), $dryRun),
-            $dryRun
-        );
-    }
-
-    public function configFile()
-    {
-        return dirname(__DIR__) . '/_files/db-migrate.config.php';
-    }
-
-    public function files($name = null)
-    {
-        return dirname(__DIR__) . '/_files/' . $name;
-    }
-
-    public function read($name)
-    {
-        return file_get_contents($this->files($name));
     }
 }

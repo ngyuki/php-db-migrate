@@ -1,7 +1,9 @@
 <?php
 namespace Test\Migrate;
 
+use ngyuki\DbMigrate\Migrate\Logger;
 use PDO;
+use Symfony\Component\Console\Output\NullOutput;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
 
@@ -22,7 +24,8 @@ class PdoMySqlAdapterTest extends \PHPUnit_Framework_TestCase
         $env = TestEnv::create();
         $env->clear();
 
-        $this->adapter = new PdoMySqlAdapter($env->pdo(), $env->logger(), false);
+        $dryRun = false;
+        $this->adapter = new PdoMySqlAdapter($env->pdo(), new Logger(new NullOutput()), $dryRun);
         $this->pdo = $env->pdo();
     }
 
