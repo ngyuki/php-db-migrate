@@ -61,13 +61,13 @@ class MigrationCollector
         $statuses = array();
 
         foreach ($scripts as $version => $script) {
-            $statuses[$version] = new Status($version);
+            $statuses[$version] = new Status();
             $statuses[$version]->setScript($script);
         }
 
         foreach ($versions as $version => $row) {
             if (array_key_exists($version, $statuses) === false) {
-                $statuses[$version] = new Status($version);
+                $statuses[$version] = new Status();
             }
 
             $statuses[$version]->setApplied(true);

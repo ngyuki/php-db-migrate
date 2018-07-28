@@ -15,6 +15,17 @@ class DownCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->locator->migrator->down();
+        $migrations = $this->locator->collector->listStatuses();
+
+        $down = array();
+
+        foreach ($migrations as $version => $migration) {
+            if ($migration->isApplied()) {
+                $down = [];
+                $down[$version] = $migration;
+            }
+        }
+
+        $this->locator->migrator->doMigrate($migrations, [], $down);
     }
 }

@@ -32,10 +32,28 @@ class UnmarkCommand extends AbstractCommand
             throw new \RuntimeException("You can specify that only one --all, version.");
         }
 
+        $migrations = $this->locator->collector->listStatuses();
+
         if ($all) {
-            $this->locator->migrator->unmarkAllVersions();
+            foreach ($migrations as $version => $migration) {
+                if ($migration->isApplied()) {
+                    $this->locator->adapter->delete($version);
+                    $this->locator->logger->log("unmark version: $version");
+                }
+            }
         } elseif (strlen($version)) {
-            $this->locator->migrator->unmarkVersion($version);
+            if (array_key_exists($version, $migrations) === false) {
+                throw new \RuntimeException("version not found: $version");
+            }
+
+            $migration = $migrations[$version];
+
+            if ($migration->isApplied() == false) {
+                $this->locator->logger->log("version not migrated: $version");
+            } else {
+                $this->locator->adapter->delete($version);
+                $this->locator->logger->log("unmark version: $version");
+            }
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
         }

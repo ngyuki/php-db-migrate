@@ -62,7 +62,7 @@ class ServiceLocator
 
         $reporter = new StatusReporter($logger, $collector);
 
-        $migrator = new Migrator($logger, $adapter, $executor, $collector, $reporter);
+        $migrator = new Migrator($logger, $adapter, $executor);
 
         $this->logger = $logger;
         $this->adapter = $adapter;

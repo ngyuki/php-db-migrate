@@ -15,6 +15,7 @@ class ClearCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->locator->migrator->clear();
+        $this->locator->logger->log('clear database');
+        $this->locator->adapter->clear();
     }
 }

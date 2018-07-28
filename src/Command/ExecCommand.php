@@ -1,6 +1,7 @@
 <?php
 namespace ngyuki\DbMigrate\Command;
 
+use ngyuki\DbMigrate\Migrate\Status;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,6 +21,12 @@ class ExecCommand extends AbstractCommand
     {
         $directory = $input->getArgument('directory');
 
-        $this->locator->migrator->exec($directory);
+        $scripts = $this->locator->collector->listScripts($directory);
+
+        foreach ($scripts as $name => $script) {
+            $migration = (new Status())->setScript($script);
+            $this->locator->logger->log("exec: $name");
+            $this->locator->executor->up($name, $migration->getContent());
+        }
     }
 }

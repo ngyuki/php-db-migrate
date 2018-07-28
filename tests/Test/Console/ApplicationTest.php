@@ -72,8 +72,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function exec_()
     {
-        $dir = __DIR__ . '/_files/migrations';
-        $this->tester->run('exec', '--config', $this->config, $dir);
+        $this->tester->run('mark', '--config', $this->config, '--all');
+        $versions = $this->env->versions();
+
+        $this->tester->run('exec', '--config', $this->config, __DIR__ . '/_files/migrations');
+
+        $rows = $this->env->pdo()->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
+        assertEquals(['1000', '3000', '9999'], $rows);
+
+        assertEquals($versions, $this->env->versions());
     }
 
     /**

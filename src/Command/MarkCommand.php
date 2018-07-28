@@ -32,10 +32,34 @@ class MarkCommand extends AbstractCommand
             throw new \RuntimeException("You can specify that only one --all, version.");
         }
 
+        $migrations = $this->locator->collector->listStatuses();
+
         if ($all) {
-            $this->locator->migrator->markAllVersions();
+            foreach ($migrations as $version => $migration) {
+                if ($migration->isApplied()) {
+                    // skip
+                } elseif ($migration->isMissing()) {
+                    // skip
+                } else {
+                    $this->locator->adapter->save($version, $migration->getContent());
+                    $this->locator->logger->log("mark version: $version");
+                }
+            }
         } elseif (strlen($version)) {
-            $this->locator->migrator->markVersion($version);
+            if (array_key_exists($version, $migrations) === false) {
+                throw new \RuntimeException("version not found: $version");
+            }
+
+            $migration = $migrations[$version];
+
+            if ($migration->isApplied()) {
+                $this->locator->logger->log("version already migrated: $version");
+            } elseif ($migration->isMissing()) {
+                $this->locator->logger->log("mark version: $version is missing");
+            } else {
+                $this->locator->adapter->save($version, $migration->getContent());
+                $this->locator->logger->log("mark version: $version");
+            }
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
         }

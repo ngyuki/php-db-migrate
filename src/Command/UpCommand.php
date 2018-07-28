@@ -15,6 +15,17 @@ class UpCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->locator->migrator->up();
+        $migrations = $this->locator->collector->listStatuses();
+
+        $up = [];
+
+        foreach ($migrations as $version => $migration) {
+            if ($migration->isApplied() == false) {
+                $up[$version] = $migration;
+                break;
+            }
+        }
+
+        $this->locator->migrator->doMigrate($migrations, $up, []);
     }
 }

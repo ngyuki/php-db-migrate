@@ -1,0 +1,115 @@
+<?php
+namespace Test\Migrate;
+
+use ngyuki\DbMigrate\Migrate\MigrationFilter;
+use ngyuki\DbMigrate\Migrate\Status;
+
+class MigrationFilterTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @test
+     */
+    public function migrate_nothing()
+    {
+        $migrations = [
+            '1000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '2000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '3000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '4000.sql' => (new Status())->setScript('x')->setApplied(true),
+        ];
+
+        list ($up, $down) = (new MigrationFilter())->migrate($migrations, null);
+
+        assertEmpty($up);
+        assertEmpty($down);
+    }
+
+    /**
+     * @test
+     */
+    public function migrate_()
+    {
+        $migrations = [
+            '1000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '2000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '3000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+        ];
+
+        list ($up, $down) = (new MigrationFilter())->migrate($migrations, null);
+
+        assertThat(array_keys($up), equalTo([
+            '1000.sql',
+            '2000.sql',
+            '3000.sql',
+            '4000.sql',
+        ]));
+
+        assertEmpty($down);
+    }
+
+    /**
+     * @test
+     */
+    public function migrate_target_up()
+    {
+        $migrations = [
+            '1000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '2000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '3000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+        ];
+
+        list ($up, $down) = (new MigrationFilter())->migrate($migrations, '3000.sql');
+
+        assertThat(array_keys($up), equalTo([
+            '1000.sql',
+            '2000.sql',
+            '3000.sql',
+        ]));
+
+        assertEmpty($down);
+    }
+
+    /**
+     * @test
+     */
+    public function migrate_target_down()
+    {
+        $migrations = [
+            '1000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '2000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '3000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+        ];
+
+        list ($up, $down) = (new MigrationFilter())->migrate($migrations, '1000.sql');
+
+        assertEmpty($up);
+        assertThat(array_keys($down), equalTo([
+            '2000.sql',
+            '3000.sql',
+        ]));
+    }
+
+    /**
+     * @test
+     */
+    public function migrate_part()
+    {
+        $migrations = [
+            '1000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '2000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '3000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+        ];
+
+        list ($up, $down) = (new MigrationFilter())->migrate($migrations, '3000.sql');
+
+        assertThat(array_keys($up), equalTo([
+            '2000.sql',
+        ]));
+
+        assertEmpty($down);
+    }
+}

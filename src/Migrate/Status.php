@@ -6,11 +6,6 @@ use Guzzle\Common\Exception\RuntimeException;
 class Status
 {
     /**
-     * @var string
-     */
-    private $version;
-
-    /**
      * @var string|null
      */
     private $script;
@@ -18,7 +13,7 @@ class Status
     /**
      * @var string|null
      */
-    private $source;
+    private $scriptContent;
 
     /**
      * @var string|null
@@ -28,23 +23,23 @@ class Status
     /**
      * @var bool
      */
-    private $applied;
-
-    public function __construct($version)
-    {
-        $this->version = $version;
-        $this->applied = false;
-    }
+    private $applied = false;
 
     /**
-     * @param string $script
+     * @param string|null $script
+     * @return $this
      */
     public function setScript($script)
     {
         $this->script = $script;
-        $this->source = null;
+        $this->scriptContent = null;
+        return $this;
     }
 
+    /**
+     * @param string|null $content
+     * @return $this
+     */
     public function setContent($content)
     {
         $this->content = $content;
@@ -53,25 +48,25 @@ class Status
 
     /**
      * @param bool $applied
+     * @return $this
      */
     public function setApplied($applied)
     {
         $this->applied = $applied;
+        return $this;
     }
 
     public function getContent()
     {
-        if ($this->source === null) {
-            if ($this->script !== null) {
-                $source = file_get_contents($this->script);
-                if ($source === false) {
-                    throw new RuntimeException("Unable read \"$this->script\"");
-                }
-                $this->source = $source;
-            };
+        if ($this->scriptContent === null && $this->script !== null) {
+            $scriptContent = file_get_contents($this->script);
+            if ($scriptContent === false) {
+                throw new RuntimeException("Unable read \"$this->script\"");
+            }
+            $this->scriptContent = $scriptContent;
         }
-        if ($this->source !== null) {
-            return $this->source;
+        if ($this->scriptContent !== null) {
+            return $this->scriptContent;
         } else {
             return $this->content;
         }

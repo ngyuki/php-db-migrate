@@ -143,14 +143,11 @@ class PdoMySqlAdapter implements AdapterInterface
 
     public function clear()
     {
-        if ($this->dryRun) {
-            return;
-        }
-
         $database = $this->pdo->query('select database()')->fetchColumn();
         $quotedDatabase = $this->quoteIdentity($database);
-        $this->pdo->exec("drop database if exists $quotedDatabase");
-        $this->pdo->exec("create database $quotedDatabase");
-        $this->pdo->exec("use $quotedDatabase");
+
+        $this->exec("drop database if exists $quotedDatabase");
+        $this->exec("create database $quotedDatabase");
+        $this->exec("use $quotedDatabase");
     }
 }

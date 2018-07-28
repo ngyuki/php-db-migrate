@@ -1,6 +1,7 @@
 <?php
 namespace ngyuki\DbMigrate\Command;
 
+use ngyuki\DbMigrate\Migrate\MigrationFilter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,6 +19,12 @@ class MigrateCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $target = $input->getArgument('target');
-        $this->locator->migrator->migrate($target);
+
+        $migrations = $this->locator->collector->listStatuses();
+
+        $filter = new MigrationFilter();
+        list ($up, $down) = $filter->migrate($migrations, $target);
+
+        $this->locator->migrator->doMigrate($migrations, $up, $down);
     }
 }
