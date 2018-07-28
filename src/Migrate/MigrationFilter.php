@@ -42,4 +42,33 @@ class MigrationFilter
 
         return [$up, $down];
     }
+
+    /**
+     * @param Status[] $migrations
+     * @param bool $missing
+     * @param bool $all
+     *
+     * @return Status[]
+     */
+    public function down(array $migrations, $missing, $all)
+    {
+        $down = array();
+
+        foreach ($migrations as $version => $migration) {
+            if ($migration->isApplied()) {
+                if ($missing) {
+                    if ($migration->isMissing()) {
+                        $down[$version] = $migration;
+                    }
+                } else {
+                    if (!$all) {
+                        $down = [];
+                    }
+                    $down[$version] = $migration;
+                }
+            }
+        }
+
+        return $down;
+    }
 }

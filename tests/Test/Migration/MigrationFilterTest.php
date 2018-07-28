@@ -112,4 +112,36 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
 
         assertEmpty($down);
     }
+
+    /**
+     * @test
+     * @dataProvider down_data
+     */
+    public function down_()
+    {
+        list ($missing, $all,$expected) = func_get_args();
+
+        $migrations = [
+            '1000.sql' => (new Status())->setScript(null)->setApplied(true),
+            '2000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '3000.sql' => (new Status())->setScript('x')->setApplied(false),
+        ];
+
+        $down = (new MigrationFilter())->down($migrations, $missing, $all);
+
+        assertThat(array_keys($down), equalTo($expected));
+    }
+
+    public function down_data()
+    {
+        return [[
+            0, 0, ['2000.sql'],
+
+            // missing
+            1, 0, ['1000.sql'],
+
+            // all
+            0, 1, ['1000.sql', '2000.sql'],
+        ]];
+    }
 }

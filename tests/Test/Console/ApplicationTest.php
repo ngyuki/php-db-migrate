@@ -61,10 +61,23 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function up_down_()
     {
         $this->tester->run('up', '--config', $this->config);
-        assertEquals(array("1000.sql"), $this->env->versions());
+        $this->tester->run('up', '--config', $this->config);
+        assertEquals(["1000.sql", "3000.php"], $this->env->versions());
 
         $this->tester->run('down', '--config', $this->config);
-        assertEquals(array(), $this->env->versions());
+        assertEquals(["1000.sql"], $this->env->versions());
+    }
+
+    /**
+     * @test
+     */
+    public function up_down_all_()
+    {
+        $this->tester->run('up', '--config', $this->config, '--all');
+        assertEquals(["1000.sql", "3000.php", "9999.sql"], $this->env->versions());
+
+        $this->tester->run('down', '--config', $this->config, '--all');
+        assertEquals([], $this->env->versions());
     }
 
     /**

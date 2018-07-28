@@ -148,13 +148,60 @@ $ vendor/bin/db-migrate up
 up: 20140829-02.sql
 ```
 
+引数として `--all` を付けるとすべての未適用のバージョンがマイグレーションされます。
+
+```console
+$ vendor/bin/db-migrate up --all
+up: 20140829-02.sql
+up: 20140830-01.php
+up: 20140830-02.sql
+```
+
 ### `db-migrate down`
 
 適用済のバージョンを1つだけロールバックします。
 
 ```console
+$ vendor/bin/db-migrate status
+* 20140828-01.sql
+* 20140829-01.sql
+* 20140829-02.sql
+  20140830-01.php
+  20140830-02.sql
+
 $ vendor/bin/db-migrate down
 down: 20140829-02.sql
+```
+
+引数として `--all` を付けるとすべての適用済のバージョンがロールバックされます。
+
+```console
+$ vendor/bin/db-migrate status
+* 20140828-01.sql
+* 20140829-01.sql
+* 20140829-02.sql
+  20140830-01.php
+  20140830-02.sql
+
+$ vendor/bin/db-migrate down --all
+down: 20140829-02.sql
+down: 20140829-01.sql
+down: 20140828-01.sql
+```
+
+引数として `--missing` を付けるとマイグレーションファイルが失われているバージョンのみロールバックされます。
+
+```console
+$ vendor/bin/db-migrate status
+* 20140828-01.sql
+* 20140829-01.sql (missing)
+* 20140829-02.sql (missing)
+  20140830-01.php
+  20140830-02.sql
+
+$ vendor/bin/db-migrate down --missing
+down: 20140829-02.sql
+down: 20140829-01.sql
 ```
 
 ### `db-migrate redo`
