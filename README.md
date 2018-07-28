@@ -220,7 +220,7 @@ up: 20140829-02.sql
 
 ```console
 $ vendor/bin/db-migrate mark 20140828-01.sql
-mark version: 20140828-01.sql
+mark: 20140828-01.sql
 ```
 
 なんらかの原因でマイグレーションが失敗したときに、手作業でマイグレーションを行った後に失敗したスクリプトを適用済であるとマークするために使用できます。
@@ -229,11 +229,11 @@ mark version: 20140828-01.sql
 
 ```console
 $ vendor/bin/db-migrate mark --all
-mark version: 20140828-01.sql
-mark version: 20140829-01.sql
-mark version: 20140829-02.sql
-mark version: 20140830-01.php
-mark version: 20140830-02.sql
+mark: 20140828-01.sql
+mark: 20140829-01.sql
+mark: 20140829-02.sql
+mark: 20140830-01.php
+mark: 20140830-02.sql
 ```
 
 ### `db-migrate unmark`
@@ -242,18 +242,18 @@ mark version: 20140830-02.sql
 
 ```console
 $ vendor/bin/db-migrate unmark 20140828-01.sql
-unmark version: 20140828-01.sql
+unmark: 20140828-01.sql
 ```
 
 引数として `--all` を付けるとすべてのスクリプトが未適用であるとマークされます。
 
 ```console
 $ vendor/bin/db-migrate unmark --all
-unmark version: 20140828-01.sql
-unmark version: 20140829-01.sql
-unmark version: 20140829-02.sql
-unmark version: 20140830-01.php
-unmark version: 20140830-02.sql
+unmark: 20140828-01.sql
+unmark: 20140829-01.sql
+unmark: 20140829-02.sql
+unmark: 20140830-01.php
+unmark: 20140830-02.sql
 ```
 
 ### `db-migrate exec`
@@ -340,8 +340,6 @@ SQL はセミコロンでコマンドが区切られているものとして解�
 
 ```console
 $ vendor/bin/db-migrate migrate -c sql/config.php
-migrate: 20140828-01.sql
-fix version: 20140828-01.sql
 ```
 
 オプション `-c` で指定されたパスがディレクトリの場合、そのディレクトリから次の順で設定ファイルが探索されます。

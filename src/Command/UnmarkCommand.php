@@ -38,7 +38,7 @@ class UnmarkCommand extends AbstractCommand
             foreach ($migrations as $version => $migration) {
                 if ($migration->isApplied()) {
                     $this->locator->adapter->delete($version);
-                    $this->locator->logger->log("unmark version: $version");
+                    $this->locator->logger->log("unmark: $version");
                 }
             }
         } elseif (strlen($version)) {
@@ -52,7 +52,7 @@ class UnmarkCommand extends AbstractCommand
                 $this->locator->logger->log("version not migrated: $version");
             } else {
                 $this->locator->adapter->delete($version);
-                $this->locator->logger->log("unmark version: $version");
+                $this->locator->logger->log("unmark: $version");
             }
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");
