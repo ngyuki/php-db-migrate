@@ -101,7 +101,7 @@ class Migrator
                 $cmp = strcmp($version, $target);
             }
 
-            if ($migration->isMissing() === null) {
+            if ($migration->isMissing()) {
                 // ファイルが見つからなければ DOWN する
                 $cmp = 1;
             }
