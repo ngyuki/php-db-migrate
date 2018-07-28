@@ -15,7 +15,7 @@ class RedoCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $migrations = $this->locator->collector->listStatuses();
+        $migrations = $this->locator->collector->listMigrations();
 
         $redo = [];
 

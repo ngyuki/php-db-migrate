@@ -18,7 +18,7 @@ class UpCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $all = $input->getOption('all');
-        $migrations = $this->locator->collector->listStatuses();
+        $migrations = $this->locator->collector->listMigrations();
 
         $up = [];
 

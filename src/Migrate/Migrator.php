@@ -29,9 +29,9 @@ class Migrator
     }
 
     /**
-     * @param Status[] $migrations
-     * @param Status[] $up
-     * @param Status[] $down
+     * @param Migration[] $migrations
+     * @param Migration[] $up
+     * @param Migration[] $down
      */
     public function doMigrate(array $migrations, array $up, array $down)
     {

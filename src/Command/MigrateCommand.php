@@ -20,7 +20,7 @@ class MigrateCommand extends AbstractCommand
     {
         $target = $input->getArgument('target');
 
-        $migrations = $this->locator->collector->listStatuses();
+        $migrations = $this->locator->collector->listMigrations();
 
         $filter = new MigrationFilter();
         list ($up, $down) = $filter->migrate($migrations, $target);

@@ -9,7 +9,7 @@ class StatusCommand extends AbstractCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('status')->setDescription('Show migrate status');
+        $this->setName('status')->setDescription('Show migration status');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -32,7 +32,7 @@ class MarkCommand extends AbstractCommand
             throw new \RuntimeException("You can specify that only one --all, version.");
         }
 
-        $migrations = $this->locator->collector->listStatuses();
+        $migrations = $this->locator->collector->listMigrations();
 
         if ($all) {
             foreach ($migrations as $version => $migration) {

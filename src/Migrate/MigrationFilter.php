@@ -6,7 +6,7 @@ class MigrationFilter
     /**
      * 指定されたバージョンまでマイグレートするように仕分ける
      *
-     * @param Status[] $migrations
+     * @param Migration[] $migrations
      * @param string $target
      *
      * @return array [$up_migrations, $down_migrations]
@@ -44,11 +44,11 @@ class MigrationFilter
     }
 
     /**
-     * @param Status[] $migrations
+     * @param Migration[] $migrations
      * @param bool $missing
      * @param bool $all
      *
-     * @return Status[]
+     * @return Migration[]
      */
     public function down(array $migrations, $missing, $all)
     {

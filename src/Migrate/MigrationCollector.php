@@ -52,29 +52,29 @@ class MigrationCollector
         return $list;
     }
 
-    public function listStatuses()
+    public function listMigrations()
     {
         $scripts = $this->listScripts();
         $versions = $this->adapter->fetchAll();
 
-        /** @var $statuses Status[] */
-        $statuses = array();
+        /** @var $migrations Migration[] */
+        $migrations = array();
 
         foreach ($scripts as $version => $script) {
-            $statuses[$version] = new Status();
-            $statuses[$version]->setScript($script);
+            $migrations[$version] = new Migration();
+            $migrations[$version]->setScript($script);
         }
 
         foreach ($versions as $version => $row) {
-            if (array_key_exists($version, $statuses) === false) {
-                $statuses[$version] = new Status();
+            if (array_key_exists($version, $migrations) === false) {
+                $migrations[$version] = new Migration();
             }
 
-            $statuses[$version]->setApplied(true);
-            $statuses[$version]->setContent($row['content']);
+            $migrations[$version]->setApplied(true);
+            $migrations[$version]->setContent($row['content']);
         }
 
-        ksort($statuses);
-        return $statuses;
+        ksort($migrations);
+        return $migrations;
     }
 }

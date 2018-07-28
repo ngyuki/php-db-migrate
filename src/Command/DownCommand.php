@@ -25,7 +25,7 @@ class DownCommand extends AbstractCommand
             throw new \RuntimeException("You can specify that only one --all, --missing.");
         }
 
-        $migrations = $this->locator->collector->listStatuses();
+        $migrations = $this->locator->collector->listMigrations();
         $down = (new MigrationFilter())->down($migrations, $missing, $all);
         $this->locator->migrator->doMigrate($migrations, [], $down);
     }

@@ -2,7 +2,7 @@
 namespace Test\Migrate;
 
 use ngyuki\DbMigrate\Migrate\MigrationFilter;
-use ngyuki\DbMigrate\Migrate\Status;
+use ngyuki\DbMigrate\Migrate\Migration;
 
 class MigrationFilterTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,10 +12,10 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
     public function migrate_nothing()
     {
         $migrations = [
-            '1000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '2000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '3000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '4000.sql' => (new Status())->setScript('x')->setApplied(true),
+            '1000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '2000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '3000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '4000.sql' => (new Migration())->setScript('x')->setApplied(true),
         ];
 
         list ($up, $down) = (new MigrationFilter())->migrate($migrations, null);
@@ -30,10 +30,10 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
     public function migrate_()
     {
         $migrations = [
-            '1000.sql' => (new Status())->setScript('x')->setApplied(false),
-            '2000.sql' => (new Status())->setScript('x')->setApplied(false),
-            '3000.sql' => (new Status())->setScript('x')->setApplied(false),
-            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '1000.sql' => (new Migration())->setScript('x')->setApplied(false),
+            '2000.sql' => (new Migration())->setScript('x')->setApplied(false),
+            '3000.sql' => (new Migration())->setScript('x')->setApplied(false),
+            '4000.sql' => (new Migration())->setScript('x')->setApplied(false),
         ];
 
         list ($up, $down) = (new MigrationFilter())->migrate($migrations, null);
@@ -54,10 +54,10 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
     public function migrate_target_up()
     {
         $migrations = [
-            '1000.sql' => (new Status())->setScript('x')->setApplied(false),
-            '2000.sql' => (new Status())->setScript('x')->setApplied(false),
-            '3000.sql' => (new Status())->setScript('x')->setApplied(false),
-            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '1000.sql' => (new Migration())->setScript('x')->setApplied(false),
+            '2000.sql' => (new Migration())->setScript('x')->setApplied(false),
+            '3000.sql' => (new Migration())->setScript('x')->setApplied(false),
+            '4000.sql' => (new Migration())->setScript('x')->setApplied(false),
         ];
 
         list ($up, $down) = (new MigrationFilter())->migrate($migrations, '3000.sql');
@@ -77,10 +77,10 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
     public function migrate_target_down()
     {
         $migrations = [
-            '1000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '2000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '3000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '1000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '2000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '3000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '4000.sql' => (new Migration())->setScript('x')->setApplied(false),
         ];
 
         list ($up, $down) = (new MigrationFilter())->migrate($migrations, '1000.sql');
@@ -98,10 +98,10 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
     public function migrate_part()
     {
         $migrations = [
-            '1000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '2000.sql' => (new Status())->setScript('x')->setApplied(false),
-            '3000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '4000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '1000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '2000.sql' => (new Migration())->setScript('x')->setApplied(false),
+            '3000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '4000.sql' => (new Migration())->setScript('x')->setApplied(false),
         ];
 
         list ($up, $down) = (new MigrationFilter())->migrate($migrations, '3000.sql');
@@ -122,9 +122,9 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
         list ($missing, $all, $expected) = func_get_args();
 
         $migrations = [
-            '1000.sql' => (new Status())->setScript(null)->setApplied(true),
-            '2000.sql' => (new Status())->setScript('x')->setApplied(true),
-            '3000.sql' => (new Status())->setScript('x')->setApplied(false),
+            '1000.sql' => (new Migration())->setScript(null)->setApplied(true),
+            '2000.sql' => (new Migration())->setScript('x')->setApplied(true),
+            '3000.sql' => (new Migration())->setScript('x')->setApplied(false),
         ];
 
         $down = (new MigrationFilter())->down($migrations, $missing, $all);

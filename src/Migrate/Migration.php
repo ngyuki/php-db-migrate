@@ -3,7 +3,7 @@ namespace ngyuki\DbMigrate\Migrate;
 
 use RuntimeException;
 
-class Status
+class Migration
 {
     /**
      * @var string|null

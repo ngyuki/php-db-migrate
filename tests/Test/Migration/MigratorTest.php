@@ -4,7 +4,7 @@ namespace Test\Migrate;
 use ngyuki\DbMigrate\Console\ConfigLoader;
 use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\ServiceLocator;
-use ngyuki\DbMigrate\Migrate\Status;
+use ngyuki\DbMigrate\Migrate\Migration;
 use PDO;
 use PDOException;
 use Symfony\Component\Console\Output\NullOutput;
@@ -55,10 +55,10 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
     public function migrate_error()
     {
         $migrations = [
-            '0000.sql' => (new Status())->setScript(__DIR__ . '/_files/err/0000.sql'),
-            '1000.sql' => (new Status())->setScript(__DIR__ . '/_files/err/1000.sql'),
-            '2000.sql' => (new Status())->setScript(__DIR__ . '/_files/err/2000.sql'),
-            '3000.sql' => (new Status())->setScript(__DIR__ . '/_files/err/3000.sql'),
+            '0000.sql' => (new Migration())->setScript(__DIR__ . '/_files/err/0000.sql'),
+            '1000.sql' => (new Migration())->setScript(__DIR__ . '/_files/err/1000.sql'),
+            '2000.sql' => (new Migration())->setScript(__DIR__ . '/_files/err/2000.sql'),
+            '3000.sql' => (new Migration())->setScript(__DIR__ . '/_files/err/3000.sql'),
         ];
 
         try {

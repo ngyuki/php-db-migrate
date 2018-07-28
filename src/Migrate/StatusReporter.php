@@ -24,23 +24,23 @@ class StatusReporter
      */
     public function show()
     {
-        $statuses = $this->collector->listStatuses();
+        $migrations = $this->collector->listMigrations();
 
-        if (count($statuses) == 0) {
+        if (count($migrations) == 0) {
             $this->logger->log("migrate nothing");
             return 0;
         }
 
         $code = 0;
 
-        foreach ($statuses as $version => $status) {
-            if ($status->isMissing()) {
+        foreach ($migrations as $version => $migration) {
+            if ($migration->isMissing()) {
                 $suffix = " (missing)";
             } else {
                 $suffix = "";
             }
 
-            if ($status->isApplied()) {
+            if ($migration->isApplied()) {
                 $this->logger->log("* {$version}{$suffix}");
             } else {
                 $this->logger->log("  {$version}{$suffix}");
