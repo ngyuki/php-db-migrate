@@ -15,7 +15,6 @@ class DownCommand extends AbstractCommand
         $this->setName('down')->setDescription('down one version')
             ->addOption('all', '', InputOption::VALUE_NONE, 'down all versions')
             ->addOption('missing', '', InputOption::VALUE_NONE, 'down missing versions');
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

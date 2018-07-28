@@ -1,7 +1,7 @@
 <?php
 namespace ngyuki\DbMigrate\Migrate;
 
-use Guzzle\Common\Exception\RuntimeException;
+use RuntimeException;
 
 class Status
 {

@@ -52,9 +52,7 @@ class SqlExecutor implements ExecutorInterface
      */
     private function stripComment($file)
     {
-        $file = preg_replace_callback('/\/\*(.*?)\*\//s', function () {
-            return '';
-        }, $file);
+        $file = preg_replace('/\/\*(.*?)\*\//s', '', $file);
 
         return $file;
     }

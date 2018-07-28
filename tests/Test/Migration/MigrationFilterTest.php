@@ -119,7 +119,7 @@ class MigrationFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function down_()
     {
-        list ($missing, $all,$expected) = func_get_args();
+        list ($missing, $all, $expected) = func_get_args();
 
         $migrations = [
             '1000.sql' => (new Status())->setScript(null)->setApplied(true),
