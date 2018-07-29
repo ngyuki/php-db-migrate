@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use ngyuki\DbMigrate\Console\ConfigLoader;
-use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\ServiceLocator;
 
 abstract class AbstractCommand extends Command
@@ -45,6 +44,6 @@ abstract class AbstractCommand extends Command
         $loader = new ConfigLoader();
         $config = $loader->load($configPath);
 
-        $this->locator = new ServiceLocator(new Logger($output), $config, $dryRun);
+        $this->locator = new ServiceLocator($output, $config, $dryRun);
     }
 }

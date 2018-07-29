@@ -1,21 +1,23 @@
 <?php
 namespace ngyuki\DbMigrate\Migrate;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 class StatusReporter
 {
     /**
-     * @var Logger
+     * @var OutputInterface
      */
-    private $logger;
+    private $output;
 
     /**
      * @var MigrationCollector
      */
     private $collector;
 
-    public function __construct(Logger $logger, MigrationCollector $collector)
+    public function __construct(OutputInterface $output, MigrationCollector $collector)
     {
-        $this->logger = $logger;
+        $this->output = $output;
         $this->collector = $collector;
     }
 
@@ -27,25 +29,30 @@ class StatusReporter
         $migrations = $this->collector->listMigrations();
 
         if (count($migrations) == 0) {
-            $this->logger->log("migrate nothing");
+            $this->output->writeln("<info>migrate nothing</info>");
             return 0;
         }
 
         $code = 0;
 
         foreach ($migrations as $version => $migration) {
-            if ($migration->isMissing()) {
-                $suffix = " (missing)";
-            } else {
-                $suffix = "";
-            }
+            $line = '';
 
             if ($migration->isApplied()) {
-                $this->logger->log("* {$version}{$suffix}");
+                $line .= "<info>[*]</info> ";
             } else {
-                $this->logger->log("  {$version}{$suffix}");
+                $line .= "<info>[ ]</info> ";
                 $code = 1;
             }
+
+            $line .= "<comment>{$version}</comment>";
+
+            if ($migration->isMissing()) {
+                $line .= " <fg=red;options=bold>(missing)</>";
+                $code = 1;
+            }
+
+            $this->output->writeln($line);
         }
 
         return $code;

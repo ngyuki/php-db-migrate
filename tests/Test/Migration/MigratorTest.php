@@ -2,7 +2,6 @@
 namespace Test\Migrate;
 
 use ngyuki\DbMigrate\Console\ConfigLoader;
-use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\ServiceLocator;
 use ngyuki\DbMigrate\Migrate\Migration;
 use PDO;
@@ -46,7 +45,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
 
     public function initServiceLocator($dryRun = false)
     {
-        $this->locator = new ServiceLocator(new Logger(new NullOutput()), $this->config, $dryRun);
+        $this->locator = new ServiceLocator(new NullOutput(), $this->config, $dryRun);
     }
 
     /**

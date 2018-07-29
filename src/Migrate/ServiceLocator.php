@@ -7,6 +7,7 @@ use ngyuki\DbMigrate\Executor\ExecutorManager;
 use ngyuki\DbMigrate\Executor\PhpExecutor;
 use ngyuki\DbMigrate\Executor\SqlExecutor;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @property Logger             $logger
@@ -48,8 +49,10 @@ class ServiceLocator
      */
     private $migrator;
 
-    public function __construct(Logger $logger, Config $config, $dryRun)
+    public function __construct(OutputInterface $output, Config $config, $dryRun)
     {
+        $logger = new Logger($output);
+
         $adapter = (new AdapterFactory())->create($config->pdo, $logger, $dryRun);
 
         $context = new MigrateContext($config->toArray(), $logger, $adapter, $dryRun);
@@ -60,7 +63,7 @@ class ServiceLocator
 
         $collector = new MigrationCollector($adapter, $config->scriptDirectory);
 
-        $reporter = new StatusReporter($logger, $collector);
+        $reporter = new StatusReporter($output, $collector);
 
         $migrator = new Migrator($logger, $adapter, $executor);
 
