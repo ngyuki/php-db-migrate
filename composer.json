@@ -50,6 +50,11 @@
             "@composer test",
             "@composer cs",
             "@composer phan"
+        ],
+        "build": [
+            "[ -e box.phar ] || curl -LS https://box-project.github.io/box2/installer.php | php",
+            "@composer dump-autoload -o -a --no-dev",
+            "@php -d phar.readonly=0 box.phar build -v"
         ]
     }
 }

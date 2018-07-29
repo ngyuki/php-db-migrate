@@ -10,15 +10,17 @@ use ngyuki\DbMigrate\Command;
 
 class Application extends BaseApplication
 {
-    const NAME = 'db-migrate';
-    const VERSION = '@dev';
+    /**
+     * @var string
+     */
+    private $longVersion;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct()
+    public function __construct($name = null, $version = null)
     {
-        parent::__construct(self::NAME, self::VERSION);
+        parent::__construct($name, $version);
 
         $commands = array();
         $commands[] = new Command\MigrateCommand();
@@ -32,6 +34,17 @@ class Application extends BaseApplication
         $commands[] = new Command\ClearCommand();
 
         $this->addCommands($commands);
+    }
+
+    public function setLongVersion($longVersion)
+    {
+        $this->longVersion = $longVersion;
+        return $this;
+    }
+
+    public function getLongVersion()
+    {
+        return $this->longVersion;
     }
 
     /**

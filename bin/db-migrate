@@ -17,5 +17,18 @@ if ($loader === null) {
 
 use ngyuki\DbMigrate\Console\Application;
 
-$application = new Application();
+$version = '@git-version@';
+if (preg_match('/^@/', $version)) {
+    $version = 'UNKNOWN';
+}
+if (preg_match('/-/', $version) && !preg_match('/^@/', '@git-commit@')) {
+    $version = "$version (@git-commit@)";
+}
+$longVersion = sprintf('<info>%s</info> version <comment>%s</comment>', basename(__FILE__), $version);
+if (!preg_match('/^@/', '@datetime@')) {
+    $longVersion = "$longVersion @datetime@";
+}
+
+$application = new Application(basename(__FILE__), $version);
+$application->setLongVersion($longVersion);
 $application->run();

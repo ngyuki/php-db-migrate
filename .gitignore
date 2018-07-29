@@ -5,3 +5,4 @@
 /sql/config.php
 /.bin/
 /.envrc
+/*.phar

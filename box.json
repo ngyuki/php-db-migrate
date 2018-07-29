@@ -1,0 +1,38 @@
+{
+  "directories": [
+    "src"
+  ],
+  "files": [
+    "vendor/autoload.php"
+  ],
+  "finder": [
+    {
+      "in": [
+        "vendor/composer",
+        "vendor/symfony/console",
+        "vendor/symfony/filesystem",
+        "vendor/symfony/polyfill-mbstring"
+      ],
+      "exclude": [
+        "Tests"
+      ],
+      "notName": [
+        "*.md",
+        "composer.json",
+        "phpunit.xml",
+        "phpunit.xml.dist"
+      ]
+    }
+  ],
+  "main": "bin/db-migrate",
+  "output": "db-migrate.phar",
+  "chmod": "0755",
+  "stub": true,
+  "git-commit": "git-commit",
+  "git-version": "git-version",
+  "datetime": "datetime",
+  "compression": "GZ",
+  "compactors": [
+    "Herrera\\Box\\Compactor\\Php"
+  ]
+}
