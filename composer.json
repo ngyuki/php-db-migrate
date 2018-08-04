@@ -10,18 +10,17 @@
     ],
     "config": {
         "platform": {
-            "php": "5.4.16"
+            "php": "7.0.10"
         }
     },
     "require": {
-        "php": ">=5.4.16",
-        "symfony/console": "~2.8",
-        "symfony/filesystem": "~2.8"
+        "php": "^7.0.10",
+        "symfony/console": "^3.4",
+        "symfony/filesystem": "^3.4"
     },
     "require-dev": {
-        "symfony/finder": "~2.8",
-        "phpunit/phpunit": "^4.8",
-        "satooshi/php-coveralls": "^1.0"
+        "phpunit/phpunit": "^6.5",
+        "php-coveralls/php-coveralls": "^2.1"
     },
     "autoload": {
         "psr-4": {

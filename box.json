@@ -11,6 +11,7 @@
         "vendor/composer",
         "vendor/symfony/console",
         "vendor/symfony/filesystem",
+        "vendor/symfony/polyfill-ctype",
         "vendor/symfony/polyfill-mbstring"
       ],
       "exclude": [
