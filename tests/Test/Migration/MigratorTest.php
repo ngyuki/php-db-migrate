@@ -7,10 +7,11 @@ use ngyuki\DbMigrate\Migrate\Migration;
 use PDO;
 use PDOException;
 use Symfony\Component\Console\Output\NullOutput;
+use TestHelper\TestCase;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Migrate\Config;
 
-class MigratorTest extends \PHPUnit_Framework_TestCase
+class MigratorTest extends TestCase
 {
     /**
      * @var TestEnv

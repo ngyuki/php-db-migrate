@@ -4,12 +4,13 @@ namespace Test\Migrate;
 use ngyuki\DbMigrate\Migrate\Logger;
 use PDO;
 use Symfony\Component\Console\Output\NullOutput;
+use TestHelper\TestCase;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Executor\SqlExecutor;
 use ngyuki\DbMigrate\Adapter\AdapterFactory;
 use ngyuki\DbMigrate\Adapter\AdapterInterface;
 
-class SqlExecutorTest extends \PHPUnit_Framework_TestCase
+class SqlExecutorTest extends TestCase
 {
     /**
      * @var PDO

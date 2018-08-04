@@ -2,11 +2,12 @@
 namespace Test\Console;
 
 use PDO;
+use TestHelper\TestCase;
 use TestHelper\TestEnv;
 use TestHelper\ApplicationTester;
 use ngyuki\DbMigrate\Console\Application;
 
-class ApplicationTest extends \PHPUnit_Framework_TestCase
+class ApplicationTest extends TestCase
 {
     /**
      * @var TestEnv
@@ -42,7 +43,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function status_()
     {
-        $this->tester->run('status', '--config', $this->config);
+        $rc = $this->tester->run('status', '--config', $this->config);
+        self::assertEquals(0, $rc);
     }
 
     /**
@@ -172,6 +174,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     public function clear_()
     {
-        $this->tester->run('clear', '--config', $this->config);
+        $rc = $this->tester->run('clear', '--config', $this->config);
+        self::assertEquals(0, $rc);
     }
 }

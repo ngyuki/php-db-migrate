@@ -2,10 +2,11 @@
 namespace Test\Migrate;
 
 use PDO;
+use TestHelper\TestCase;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Migrate\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
     /**
      * @var TestEnv

@@ -1,11 +1,12 @@
 <?php
 namespace Integration\MissingMigration;
 
+use TestHelper\TestCase;
 use TestHelper\TestEnv;
 use TestHelper\ApplicationTester;
 use ngyuki\DbMigrate\Console\Application;
 
-class MissingMigrationTest extends \PHPUnit_Framework_TestCase
+class MissingMigrationTest extends TestCase
 {
     /**
      * @var TestEnv

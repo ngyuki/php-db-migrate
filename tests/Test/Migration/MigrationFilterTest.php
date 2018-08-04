@@ -3,8 +3,9 @@ namespace Test\Migrate;
 
 use ngyuki\DbMigrate\Migrate\MigrationFilter;
 use ngyuki\DbMigrate\Migrate\Migration;
+use TestHelper\TestCase;
 
-class MigrationFilterTest extends \PHPUnit_Framework_TestCase
+class MigrationFilterTest extends TestCase
 {
     /**
      * @test

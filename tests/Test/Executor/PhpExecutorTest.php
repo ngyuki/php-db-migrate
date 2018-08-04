@@ -7,10 +7,11 @@ use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\MigrateContext;
 use PDO;
 use Symfony\Component\Console\Output\NullOutput;
+use TestHelper\TestCase;
 use TestHelper\TestEnv;
 use ngyuki\DbMigrate\Executor\PhpExecutor;
 
-class PhpExecutorTest extends \PHPUnit_Framework_TestCase
+class PhpExecutorTest extends TestCase
 {
     /**
      * @var PDO
