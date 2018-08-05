@@ -19,8 +19,8 @@ class Config extends \ArrayIterator
     {
         $cfg += array(
             'pdo' => null,
-            'directory' => 'migrate',
-            'work_dir' => '',
+            'directory' => 'migration',
+            'work_dir' => dirname($file),
         );
 
         parent::__construct($cfg, self::ARRAY_AS_PROPS);
@@ -29,10 +29,8 @@ class Config extends \ArrayIterator
 
         if (strlen($this['work_dir'])) {
             $this->workingDirectory = $this['work_dir'];
-        } elseif (strlen($file)) {
-            $this->workingDirectory = dirname($file);
         } else {
-            $this->workingDirectory = getcwd();
+            $this->workingDirectory = dirname($file);
         }
 
         $this->fixRelativePath();

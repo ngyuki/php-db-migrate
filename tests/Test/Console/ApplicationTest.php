@@ -19,11 +19,6 @@ class ApplicationTest extends TestCase
      */
     private $tester;
 
-    /**
-     * @var string
-     */
-    private $config;
-
     public function setUp()
     {
         $this->env = new TestEnv();
@@ -35,7 +30,7 @@ class ApplicationTest extends TestCase
 
         $this->tester = new ApplicationTester($app);
 
-        $this->config = __DIR__ . '/_files';
+        chdir(__DIR__ . '/_files/');
     }
 
     /**
@@ -43,7 +38,7 @@ class ApplicationTest extends TestCase
      */
     public function status_()
     {
-        $rc = $this->tester->run('status', '--config', $this->config);
+        $rc = $this->tester->run('status');
         self::assertEquals(0, $rc);
     }
 
@@ -52,7 +47,7 @@ class ApplicationTest extends TestCase
      */
     public function migrate_()
     {
-        $this->tester->run('migrate', '--config', $this->config);
+        $this->tester->run('migrate');
 
         assertEquals(array("1000.sql", "3000.php", "9999.sql"), $this->env->versions());
     }
@@ -62,11 +57,11 @@ class ApplicationTest extends TestCase
      */
     public function up_down_()
     {
-        $this->tester->run('up', '--config', $this->config);
-        $this->tester->run('up', '--config', $this->config);
+        $this->tester->run('up');
+        $this->tester->run('up');
         assertEquals(["1000.sql", "3000.php"], $this->env->versions());
 
-        $this->tester->run('down', '--config', $this->config);
+        $this->tester->run('down');
         assertEquals(["1000.sql"], $this->env->versions());
     }
 
@@ -75,10 +70,10 @@ class ApplicationTest extends TestCase
      */
     public function up_down_all_()
     {
-        $this->tester->run('up', '--config', $this->config, '--all');
+        $this->tester->run('up', '--all');
         assertEquals(["1000.sql", "3000.php", "9999.sql"], $this->env->versions());
 
-        $this->tester->run('down', '--config', $this->config, '--all');
+        $this->tester->run('down', '--all');
         assertEquals([], $this->env->versions());
     }
 
@@ -87,10 +82,10 @@ class ApplicationTest extends TestCase
      */
     public function exec_()
     {
-        $this->tester->run('mark', '--config', $this->config, '--all');
+        $this->tester->run('mark', '--all');
         $versions = $this->env->versions();
 
-        $this->tester->run('exec', '--config', $this->config, __DIR__ . '/_files/migrations');
+        $this->tester->run('exec', __DIR__ . '/_files/migrations');
 
         $rows = $this->env->pdo()->query("select * from tt")->fetchAll(PDO::FETCH_COLUMN);
         assertEquals(['1000', '3000', '9999'], $rows);
@@ -103,7 +98,7 @@ class ApplicationTest extends TestCase
      */
     public function set_all()
     {
-        $this->tester->run('set', '--all', '--config', $this->config);
+        $this->tester->run('set', '--all');
 
         assertEquals(array("1000.sql", "3000.php", "9999.sql"), $this->env->versions());
     }
@@ -113,7 +108,7 @@ class ApplicationTest extends TestCase
      */
     public function set_one()
     {
-        $this->tester->run('set', '3000.php', '--config', $this->config);
+        $this->tester->run('set', '3000.php');
 
         assertEquals(array('3000.php'), $this->env->versions());
     }
@@ -125,7 +120,7 @@ class ApplicationTest extends TestCase
      */
     public function set_none()
     {
-        $this->tester->run('set', '--config', $this->config);
+        $this->tester->run('set');
     }
 
     /**
@@ -136,14 +131,15 @@ class ApplicationTest extends TestCase
      */
     public function set_too_many_args()
     {
-        $this->tester->runArgs(func_get_args());
+        $args = func_get_args();
+        $this->tester->runArgs($args);
     }
 
     public function set_too_many_args_data()
     {
         return array(
-            array('set', '--config', $this->config, '--all', 'version'),
-            array('set', '--config', $this->config, '--all', 'version'),
+            array('set', '--all', 'version'),
+            array('set', '--all', 'version'),
         );
     }
 
@@ -152,8 +148,8 @@ class ApplicationTest extends TestCase
      */
     public function unset_all()
     {
-        $this->tester->run('set', '--config', $this->config, '--all');
-        $this->tester->run('unset', '--config', $this->config, '--all');
+        $this->tester->run('set', '--all');
+        $this->tester->run('unset', '--all');
 
         assertEmpty($this->env->versions());
     }
@@ -163,8 +159,8 @@ class ApplicationTest extends TestCase
      */
     public function unset_one()
     {
-        $this->tester->run('set', '--config', $this->config, '--all');
-        $this->tester->run('unset', '--config', $this->config, '3000.php');
+        $this->tester->run('set', '--all');
+        $this->tester->run('unset', '3000.php');
 
         assertNotContains('3000.php', $this->env->versions());
     }
@@ -174,7 +170,7 @@ class ApplicationTest extends TestCase
      */
     public function clear_()
     {
-        $rc = $this->tester->run('clear', '--config', $this->config);
+        $rc = $this->tester->run('clear');
         self::assertEquals(0, $rc);
     }
 }

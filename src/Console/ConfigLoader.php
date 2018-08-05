@@ -6,72 +6,135 @@ use ngyuki\DbMigrate\Migrate\Config;
 class ConfigLoader
 {
     /**
-     * @param string $path
+     * @param string|null $path
      * @return Config
      */
-    public function load($path)
+    public function load(string $path = null): Config
     {
-        if (strlen($path) === 0) {
-            $arr = (new Configure())->get();
-            if ($arr) {
-                return new Config($arr);
-            }
-        }
-
-        $file = $this->resolve($path);
-        $arr = $this->loadFile($file);
-
-        if (!is_array($arr)) {
-            throw new \RuntimeException('Should return array from config file.');
-        }
-
-        return new Config($arr, $file);
+        $path = $this->resolve($path);
+        return $this->loadFile($path);
     }
 
-    private function loadFile($file)
+    private function resolve(string $path = null)
     {
-        /** @noinspection PhpIncludeInspection */
-        return include $file;
-    }
-
-    private function resolve($path)
-    {
-        if (strlen($path) === 0) {
-            $path = getenv('PHP_DB_MIGRATE_CONFIG');
+        if (strlen((string)$path)) {
+            return $path;
         }
 
-        if (is_file($path)) {
-            return realpath($path);
+        $path = getenv('PHP_DB_MIGRATE_CONFIG');
+        if (strlen((string)$path)) {
+            return $path;
         }
 
-        $files = array(
-            'db-migrate.config.php',
-            'db-migrate.config.php.dist',
-        );
-
-        if (strlen($path) === 0) {
-            $path = getcwd();
-            $files = array(
-                'sql/db-migrate.config.php',
-                'sql/db-migrate.config.php.dist',
-                'db-migrate.config.php',
-                'db-migrate.config.php.dist',
-            );
+        $path = $this->resolveComposer();
+        if (strlen((string)$path)) {
+            return $path;
         }
 
-        if (is_dir($path) === false) {
-            throw new \RuntimeException("Unable resolve config from \"$path\".");
-        }
-
-        foreach ($files as $file) {
-            if (file_exists($path . DIRECTORY_SEPARATOR . $file)) {
-                return realpath($path . DIRECTORY_SEPARATOR . $file);
-            }
+        $path = $this->resolveCurrentDirectory();
+        if (strlen((string)$path)) {
+            return $path;
         }
 
         throw new \RuntimeException(
-            "Unable resolve config." . PHP_EOL .
-            "default name is \"db-migrate.config.php\" or \"db-migrate.config.php.dist\" in \"$path\"."
+            'Unable resolve config file.' . PHP_EOL . PHP_EOL .
+            '1. "-c|--config" option' . PHP_EOL .
+            '2. "PHP_DB_MIGRATE_CONFIG" environment' . PHP_EOL .
+            '3. "extra.db-migrate" in composer.json ' . PHP_EOL .
+            '4. "db-migrate.php" or "db-migrate.php.dist" in PWD'
         );
+    }
+
+    private function mustArray($arr): array
+    {
+        if (!is_array($arr)) {
+            throw new \RuntimeException('Should return array from config file.');
+        }
+        return $arr;
+    }
+
+    private function loadFile(string $path): Config
+    {
+        if (!is_file($path)) {
+            throw new \RuntimeException("Unable resolve config from \"$path\".");
+        }
+
+        $path = realpath($path);
+        if ($path === false) {
+            throw new \RuntimeException("Unable resolve config from \"$path\".");
+        }
+
+        /** @noinspection PhpIncludeInspection */
+        $arr = include $path;
+        $arr = $this->mustArray($arr);
+        return new Config($arr, $path);
+    }
+
+    private function resolveComposer()
+    {
+        $composerFile = $this->findUpComposer();
+        if ($composerFile === null) {
+            return null;
+        }
+
+        $composerDir = dirname($composerFile);
+
+        $composerContent = file_get_contents($composerFile);
+        if ($composerContent === false) {
+            throw new \RuntimeException("Unable read \"$composerFile\"");
+        }
+
+        $composerConfig = json_decode($composerContent, true);
+        if ($composerConfig === false) {
+            throw new \RuntimeException("Unable json decode \"$composerFile\"");
+        }
+
+        if (!isset($composerConfig['extra']['db-migrate'])) {
+            return null;
+        }
+
+        $list = (array)$composerConfig['extra']['db-migrate'];
+
+        foreach ($list as $name) {
+            $path = $composerDir . DIRECTORY_SEPARATOR . $name;
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        throw new \RuntimeException("Unable resolve from \"$composerFile\".");
+    }
+
+    private function findUpComposer()
+    {
+        $dir = getcwd();
+        for (;;) {
+            $path = $dir . DIRECTORY_SEPARATOR . 'composer.json';
+            if (file_exists($path)) {
+                return $path;
+            }
+            $next = dirname($dir);
+            if ($next === $dir) {
+                break;
+            }
+            $dir = $next;
+        }
+        return null;
+    }
+
+    private function resolveCurrentDirectory()
+    {
+        $dir = getcwd();
+        $list = array(
+            'db-migrate.php',
+            'db-migrate.php.dist',
+        );
+        foreach ($list as $file) {
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+        return null;
     }
 }

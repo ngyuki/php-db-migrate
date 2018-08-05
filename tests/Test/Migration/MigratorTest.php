@@ -36,7 +36,7 @@ class MigratorTest extends TestCase
     protected function setUp()
     {
         $this->env = new TestEnv();
-        $this->config =  (new ConfigLoader())->load(__DIR__ . '/_files');
+        $this->config =  (new ConfigLoader())->load(__DIR__ . '/_files/db-migrate.php');
         $this->pdo = $this->env->pdo();
 
         $this->initServiceLocator();

@@ -1,0 +1,5 @@
+{
+    "extra": {
+        "db-migrate": ["config.php", "config.php.dist"]
+    }
+}

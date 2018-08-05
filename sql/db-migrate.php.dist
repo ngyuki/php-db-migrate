@@ -1,10 +1,11 @@
 <?php
 $host   = getenv('MYSQL_HOST')     !== false ? getenv('MYSQL_HOST')     : 'localhost';
+$port   = getenv('MYSQL_PORT')     !== false ? getenv('MYSQL_PORT')     : '3306';
 $user   = getenv('MYSQL_USER')     !== false ? getenv('MYSQL_USER')     : 'user';
 $pass   = getenv('MYSQL_PASSWORD') !== false ? getenv('MYSQL_PASSWORD') : 'pass';
 $dbname = getenv('MYSQL_DATABASE') !== false ? getenv('MYSQL_DATABASE') : 'test';
 
-$pdo = new PDO("mysql:dbname=$dbname;host=$host;charset=utf8", $user, $pass, array(
+$pdo = new PDO("mysql:dbname=$dbname;host=$host;port=$port;charset=utf8", $user, $pass, array(
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 ));
 

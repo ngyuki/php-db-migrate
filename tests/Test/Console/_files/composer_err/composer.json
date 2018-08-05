@@ -1,0 +1,5 @@
+{
+    "extra": {
+        "db-migrate": ["xxx.php", "xxx.php.dist"]
+    }
+}

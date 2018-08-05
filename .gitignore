@@ -2,7 +2,7 @@
 /vendor
 /phpunit.xml
 /.php_cs.cache
-/sql/config.php
+/sql/db-migrate.php
 /.bin/
 /.envrc
 /*.phar

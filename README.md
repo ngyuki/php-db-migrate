@@ -18,17 +18,20 @@ $ composer require ngyuki/db-migrate
 
 ### 設定ファイル
 
-`sql/db-migrate.config.php` に設定ファイルを作ります。
+`db-migrate.php` に設定ファイルを作ります。
 
 ```php
 <?php
-$pdo = new \PDO('mysql:dbname=test;host=localhost;charset=utf8', 'user', 'pass');
-
+// db-migrate.php
+$pdo = new new PDO('mysql:dbname=test;host=localhost;charset=utf8', 'user', 'pass', array(
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+));
 return array(
     // PDO のインスタンス
     'pdo' => $pdo,
-    // マイグレーションスクリプトを配置するディレクトリ（設定ファイルからの相対）
-    'directory' => 'migrate',
+    // マイグレーションスクリプトを配置するディレクトリ (default: migration)
+    // 相対パスは設定フィアルからの相対として解釈
+    'directory' => __DIR__ . '/sql/migration',
 );
 ```
 
@@ -37,7 +40,7 @@ return array(
 マイグレーションスクリプトを作成します。
 
 ```console
-$ vim sql/migrate/20140827-01.sql
+$ vim sql/migration/20140827-01.sql
 ```
 
 スクリプトは SQL で記述します。
@@ -368,26 +371,57 @@ SQL はセミコロンでコマンドが区切られているものとして解�
 
 ## 設定ファイル
 
-設定ファイルはカレントディレクトリから次の順で探索され、最初に見つかったものが使用されます。
+設定ファイルは次の方法で指定できます。上にあるものが優先されます。
 
- - `sql/db-migrate.config.php`
- - `sql/db-migrate.config.php.dist`
- - `db-migrate.config.php`
- - `db-migrate.config.php.dist`
+- コマンドラインオプション `-c` で指定
+- 環境変数 `PHP_DB_MIGRATE_CONFIG` で指定
+- composer.json で指定
+- コールバックを登録
+- カレントディレクトリから探す
 
-オプション `-c` で設定ファイルを指定することもできます。
+### コマンドラインオプション `-c` で指定
+
+コマンドラインオプション `-c` で設定ファイルを指定できます。
 
 ```console
-$ vendor/bin/db-migrate migrate -c sql/config.php
+$ vendor/bin/db-migrate migrate -c config.php
 ```
 
-オプション `-c` で指定されたパスがディレクトリの場合、そのディレクトリから次の順で設定ファイルが探索されます。
+### 環境変数 `PHP_DB_MIGRATE_CONFIG` で指定
 
- - `db-migrate.config.php`
- - `db-migrate.config.php.dist`
+環境変数 `PHP_DB_MIGRATE_CONFIG` で指定できます。
 
-## アンドキュメンテッド
+```console
+PHP_DB_MIGRATE_CONFIG=config.php vendor/bin/db-migrate migrate
+```
 
-- Configure
-  - Configure::register で設定ファイルの内容を返すクロージャーを仕込めば設定ファイルレスにできる
-  - composer autoload-dev.files から実行するスクリプトで Configure::register する想定
+### composer.json で指定
+
+プロジェクトの `composer.json` に設定ファイルのパスを指定できます。`composer.json` かカレントディレクトリから親ディレクトリを遡って検索されます。
+
+`composer.json` には次のような形で設定ファイル名を指定します。ファイル名は `composer.json` ファイルからの相対で指定します。
+
+```json
+{
+    "extra": {
+        "db-migrate": "config.php"
+    }
+}
+```
+
+配列で指定することも可能で、最初に見つかったファイルが使用されます。
+
+```json
+{
+    "extra": {
+        "db-migrate": ["config.php", "config.php.dist"]
+    }
+}
+```
+
+### カレントディレクトリから探す
+
+カレントディレクトリから次の順で探索され、最初に見つかったものが使用されます。
+
+- `db-migrate.php`
+- `db-migrate.php.dist`

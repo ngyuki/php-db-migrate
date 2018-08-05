@@ -51,8 +51,17 @@ class TestEnv
     public function pdo()
     {
         if (self::$pdo === null) {
-            $config = (new Configure)->get();
-            self::$pdo = $config['pdo'];
+            $files = [
+                    __DIR__ . '/../../sql/db-migrate.php',
+                    __DIR__ . '/../../sql/db-migrate.php.dist',
+            ];
+            foreach ($files as $file) {
+                if (file_exists($file)) {
+                    $config = require $file;
+                    self::$pdo = $config['pdo'];
+                    break;
+                }
+            }
         }
 
         return self::$pdo;
