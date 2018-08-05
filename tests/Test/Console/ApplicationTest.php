@@ -96,9 +96,9 @@ class ApplicationTest extends TestCase
     /**
      * @test
      */
-    public function set_all()
+    public function mark_all()
     {
-        $this->tester->run('set', '--all');
+        $this->tester->run('mark', '--all');
 
         assertEquals(array("1000.sql", "3000.php", "9999.sql"), $this->env->versions());
     }
@@ -106,9 +106,9 @@ class ApplicationTest extends TestCase
     /**
      * @test
      */
-    public function set_one()
+    public function mark_one()
     {
-        $this->tester->run('set', '3000.php');
+        $this->tester->run('mark', '3000.php');
 
         assertEquals(array('3000.php'), $this->env->versions());
     }
@@ -118,38 +118,38 @@ class ApplicationTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Please specify one of --all, version.
      */
-    public function set_none()
+    public function mark_none()
     {
-        $this->tester->run('set');
+        $this->tester->run('mark');
     }
 
     /**
      * @test
-     * @dataProvider set_too_many_args_data
+     * @dataProvider mark_too_many_args_data
      * @expectedException \RuntimeException
      * @expectedExceptionMessage You can specify that only one --all, version.
      */
-    public function set_too_many_args()
+    public function mark_too_many_args()
     {
         $args = func_get_args();
         $this->tester->runArgs($args);
     }
 
-    public function set_too_many_args_data()
+    public function mark_too_many_args_data()
     {
         return array(
-            array('set', '--all', 'version'),
-            array('set', '--all', 'version'),
+            array('mark', '--all', 'version'),
+            array('mark', '--all', 'version'),
         );
     }
 
     /**
      * @test
      */
-    public function unset_all()
+    public function unmark_all()
     {
-        $this->tester->run('set', '--all');
-        $this->tester->run('unset', '--all');
+        $this->tester->run('mark', '--all');
+        $this->tester->run('unmark', '--all');
 
         assertEmpty($this->env->versions());
     }
@@ -157,10 +157,10 @@ class ApplicationTest extends TestCase
     /**
      * @test
      */
-    public function unset_one()
+    public function unmark_one()
     {
-        $this->tester->run('set', '--all');
-        $this->tester->run('unset', '3000.php');
+        $this->tester->run('mark', '--all');
+        $this->tester->run('unmark', '3000.php');
 
         assertNotContains('3000.php', $this->env->versions());
     }

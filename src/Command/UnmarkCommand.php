@@ -16,9 +16,6 @@ class UnmarkCommand extends AbstractCommand
             ->addOption('all', '', InputOption::VALUE_NONE, 'Unmark all versions')
             ->addArgument('version', InputArgument::OPTIONAL, 'Unmark specific version')
         ;
-
-        // Backward Compatibility for v0.2.0
-        $this->setAliases(['unset']);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

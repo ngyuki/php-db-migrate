@@ -16,9 +16,6 @@ class MarkCommand extends AbstractCommand
             ->addOption('all', '', InputOption::VALUE_NONE, 'Mark all versions')
             ->addArgument('version', InputArgument::OPTIONAL, 'Mark specific version')
         ;
-
-        // Backward Compatibility for v0.2.0
-        $this->setAliases(['set']);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
