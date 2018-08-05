@@ -45,52 +45,6 @@ class MigrateContext implements \ArrayAccess
         return $this->properties[$name];
     }
 
-    /**
-     * @param $id
-     * @return mixed
-     * @deprecated
-     */
-    public function get($id)
-    {
-        return $this->config[$id];
-    }
-
-    /**
-     * @return array
-     * @deprecated
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * @return Logger
-     * @deprecated
-     */
-    public function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @return AdapterInterface
-     * @deprecated
-     */
-    public function getAdapter()
-    {
-        return $this->adapter;
-    }
-
-    /**
-     * @return bool
-     * @deprecated
-     */
-    public function isDryRun()
-    {
-        return $this->dryRun;
-    }
-
     public function offsetExists($offset)
     {
         return array_key_exists($offset, $this->config);
