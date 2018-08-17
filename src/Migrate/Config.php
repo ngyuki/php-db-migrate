@@ -17,6 +17,10 @@ class Config extends \ArrayIterator
      */
     public function __construct(array $cfg, $file = '')
     {
+        if (isset($cfg['work_dir'])) {
+            trigger_error('work_dir is deprecated in config file', E_USER_DEPRECATED);
+        }
+
         $cfg += array(
             'pdo' => null,
             'directory' => 'migration',

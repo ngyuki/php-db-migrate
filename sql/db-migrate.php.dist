@@ -12,6 +12,5 @@ $pdo = new PDO("mysql:dbname=$dbname;host=$host;port=$port;charset=utf8", $user,
 return array(
     'pdo' => $pdo,
     'directory' => 'migration',
-    'work_dir' => __DIR__,
     'app_value' => 3000,
 );
