@@ -1,17 +1,20 @@
 <?php
 namespace ngyuki\DbMigrate\Executor;
 
-use ngyuki\DbMigrate\Migrate\MigrateContext;
+use ngyuki\DbMigrate\Migrate\MigrationContext;
+use ReflectionFunction;
 
 class PhpExecutor implements ExecutorInterface
 {   /**
-     * @var MigrateContext
+     * @var array
      */
-    private $context;
+    private $params;
 
-    public function __construct(MigrateContext $context)
+    public function __construct(MigrationContext $context)
     {
-        $this->context = $context;
+        $this->params = $context->config + [
+            MigrationContext::class => $context,
+        ];
     }
 
     public function up($content)
@@ -65,6 +68,32 @@ class PhpExecutor implements ExecutorInterface
 
     private function execute(\Closure $func)
     {
-        call_user_func($func, $this->context);
+        $func = new ReflectionFunction($func);
+        $params = $func->getParameters();
+        $args = [];
+        foreach ($params as $param) {
+            $class = $param->getClass();
+            if ($class) {
+                $name = $class->getName();
+                if (array_key_exists($name, $this->params)) {
+                    $args[] = $this->params[$name];
+                    continue;
+                }
+            }
+            $name = $param->getName();
+            if (array_key_exists($name, $this->params)) {
+                $args[] = $this->params[$name];
+                continue;
+            }
+            if ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+                continue;
+            }
+            if ($param->isOptional()) {
+                break;
+            }
+            throw new \RuntimeException("Unable resolve argument '$name'");
+        }
+        $func->invokeArgs($args);
     }
 }

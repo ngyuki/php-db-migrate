@@ -1,9 +1,9 @@
 <?php
 
-use ngyuki\DbMigrate\Migrate\MigrateContext;
+use ngyuki\DbMigrate\Migrate\MigrationContext;
 
 return array(
-    function (MigrateContext $context) {
+    function (MigrationContext $context) {
         $val = $context['app_value'];
         if ($context->dryRun) {
             $context->exec("insert into tt values ($val) -- dry-run");
@@ -11,7 +11,7 @@ return array(
             $context->exec("insert into tt values ($val)");
         }
     },
-    function (MigrateContext $context) {
+    function (MigrationContext $context) {
         $val = $context['app_value'];
         if ($context->dryRun) {
             $context->exec("delete from tt where id = $val -- dry-run");

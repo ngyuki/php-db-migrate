@@ -6,6 +6,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @property PDO      $pdo
+ * @property array    $config
  * @property string   $scriptDirectory
  * @property string   $migrationTable
  * @property string   $workingDirectory
@@ -21,6 +22,8 @@ class Config extends \ArrayIterator
         if (isset($cfg['work_dir'])) {
             trigger_error('work_dir is deprecated in config file', E_USER_DEPRECATED);
         }
+
+        $this->config = $cfg;
 
         $cfg += array(
             'pdo' => null,

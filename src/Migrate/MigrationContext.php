@@ -4,10 +4,10 @@ namespace ngyuki\DbMigrate\Migrate;
 use ngyuki\DbMigrate\Adapter\AdapterInterface;
 
 /**
- * @property Logger $logger
+ * @property array $config
  * @property bool $dryRun
  */
-class MigrateContext implements \ArrayAccess
+class MigrationContext implements \ArrayAccess
 {
     /**
      * @var array
@@ -20,17 +20,22 @@ class MigrateContext implements \ArrayAccess
     private $adapter;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * @var array
      */
     private $properties;
 
     public function __construct(array $config, Logger $logger, AdapterInterface $adapter, $dryRun)
     {
-        $this->config = $config;
         $this->adapter = $adapter;
+        $this->logger = $logger;
 
         $this->properties = [
-            'logger' => $logger,
+            'config' => $config,
             'dryRun' => $dryRun,
         ];
     }
@@ -38,6 +43,16 @@ class MigrateContext implements \ArrayAccess
     public function exec($sql)
     {
         $this->adapter->exec($sql);
+    }
+
+    public function log($log)
+    {
+        $this->logger->log($log);
+    }
+
+    public function verbose($log)
+    {
+        $this->logger->verbose($log);
     }
 
     public function __get($name)

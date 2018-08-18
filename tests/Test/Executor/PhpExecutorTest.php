@@ -2,9 +2,8 @@
 namespace Test\Migrate;
 
 use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
-use ngyuki\DbMigrate\Migrate\Config;
 use ngyuki\DbMigrate\Migrate\Logger;
-use ngyuki\DbMigrate\Migrate\MigrateContext;
+use ngyuki\DbMigrate\Migrate\MigrationContext;
 use PDO;
 use Symfony\Component\Console\Output\NullOutput;
 use TestHelper\TestCase;
@@ -19,7 +18,7 @@ class PhpExecutorTest extends TestCase
     private $pdo;
 
     /**
-     * @var MigrateContext
+     * @var MigrationContext
      */
     private $context;
 
@@ -30,11 +29,20 @@ class PhpExecutorTest extends TestCase
         $this->pdo->query("drop table if exists tt");
         $this->pdo->query("create table tt (id int not null primary key)");
 
-        $dryRun = false;
+        $this->context = $this->createContext();
+    }
+
+    private function createContext($dryRun = false)
+    {
         $logger = new Logger(new NullOutput());
         $adapter = new PdoMySqlAdapter($this->pdo, $logger, $dryRun, 'migration');
 
-        $this->context = new MigrateContext([], $logger, $adapter, $dryRun);
+        $config = [
+            'ore' => 111,
+            \PDO::class => $this->pdo,
+        ];
+
+        return new MigrationContext($config, $logger, $adapter, $dryRun);
     }
 
     private function fetch_list()
@@ -50,7 +58,20 @@ class PhpExecutorTest extends TestCase
         $executor = new PhpExecutor($this->context);
         $executor->up(file_get_contents(__DIR__ . '/_files/exec.php'));
 
-        assertEquals(array('3000'), $this->fetch_list());
+        assertEquals(array('111', '999'), $this->fetch_list());
+    }
+
+    /**
+     * @test
+     */
+    public function execute_dryRun()
+    {
+        $this->context = $this->createContext(true);
+
+        $executor = new PhpExecutor($this->context);
+        $executor->up(file_get_contents(__DIR__ . '/_files/exec.php'));
+
+        assertEmpty($this->fetch_list());
     }
 
     /**
@@ -58,7 +79,8 @@ class PhpExecutorTest extends TestCase
      */
     public function execute_down()
     {
-        $this->pdo->query("insert into tt values ('3000')");
+        $this->pdo->query("insert into tt values ('111')");
+        $this->pdo->query("insert into tt values ('999')");
 
         $executor = new PhpExecutor($this->context);
         $executor->down(file_get_contents(__DIR__ . '/_files/exec.php'));
