@@ -367,9 +367,89 @@ SQL はセミコロンでコマンドが区切られているものとして解�
 
 ### PHP
 
-**Experimental**
+2つのクロージャーの配列を返す PHP スクリプトを記述します。1つ目のクロージャーで `up` の処理、2つ目のクロージャーで `down` の処理を実行します。
 
-仕様がぶれっぶれなので使わないでください。
+```php
+<?php
+use ngyuki\DbMigrate\Migrate\MigrationContext;
+
+return array(
+    function (MigrationContext $context) {
+        // up の処理
+        $context->exec("create table tt ( id int not null primary key )");
+    },
+    function (MigrationContext $context) {
+        // down の処理
+        $context->exec("drop table tt");
+    },
+);
+```
+
+クロージャーの引数には `ngyuki\DbMigrate\Migrate\MigrationContext` のインスタンスが渡されます。このインスタンスでメソッドやプロパティを利用できます。
+
+```php
+/**
+ * 引数で指定された SQL を実行します
+ * dry-run モードでは自動的にスキップされるため呼び出し元で dry-run を判断して分岐する必要はありません
+ */
+$context->exec($sql);
+
+/**
+ * コンソールにログを出力します
+ */
+$context->log($log);
+
+/**
+ * コンソールにログを出力します
+ * このログは verbose モードで実行されているときだけ表示されます
+ */
+$context->verbose($log);
+
+/**
+ * 実行モードが dry-run なら true を、そうではないなら false を返します
+ * `context->exec($sql)` を使っていれば dry-run を呼び出し元で判断する必要はありませんが
+ * アプリケーション独自の処理を行うときは dry-run 実行時もクロージャーは呼び出されるため
+ * このプロパティの値を見て処理を分岐してください
+ */
+$context->dryRun;
+
+/**
+ * 設定ファイルが返した連想配列をそのまま得ます
+ */
+$context->config;
+```
+
+また `MigrationContext` とは別に、設定ファイルが返した連想配列の要素がクロージャーの引数に渡されます。
+引数の順番には特に意味はなく、引数は型宣言および引数名によって自動的にインジェクションされます。
+
+例えば設定ファイルで次のように記述していた場合、
+
+```php
+use App\HogeClass;
+
+return [
+    'pdo' => new \PDO(/* ... */),
+    'value' => 12345,
+    HogeClass::class => $hogeClass,
+];
+```
+
+クロージャーは次のように記述できます。
+
+```php
+<?php
+use App\HogeClass;
+use ngyuki\DbMigrate\Migrate\MigrationContext;
+
+return array(
+    function (HogeClass $hoge, MigrationContext $context, $value) {
+        // ...
+    },
+    function ($value, HogeClass $hoge, MigrationContext $context) {
+        // ...
+    },
+);
+```
 
 ## 設定ファイル
 
