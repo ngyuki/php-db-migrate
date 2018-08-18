@@ -369,23 +369,29 @@ SQL はセミコロンでコマンドが区切られているものとして解�
 
 2つのクロージャーの配列を返す PHP スクリプトを記述します。1つ目のクロージャーで `up` の処理、2つ目のクロージャーで `down` の処理を実行します。
 
+クロージャーの戻り値に文字列または配列を返すと SQL が実行されます。
+
 ```php
 <?php
 use ngyuki\DbMigrate\Migrate\MigrationContext;
 
-return array(
-    function (MigrationContext $context) {
+return [
+    function () {
         // up の処理
-        $context->exec("create table tt ( id int not null primary key )");
+        return [
+            "create table tt ( id int not null primary key )",
+        ];
     },
     function (MigrationContext $context) {
         // down の処理
-        $context->exec("drop table tt");
+        return [
+            "drop table tt",
+        ];
     },
-);
+];
 ```
 
-クロージャーの引数には `ngyuki\DbMigrate\Migrate\MigrationContext` のインスタンスが渡されます。このインスタンスでメソッドやプロパティを利用できます。
+また、クロージャーの引数には `ngyuki\DbMigrate\Migrate\MigrationContext` のインスタンスが渡されます。このインスタンスを使って SQL を実行することもできます。
 
 ```php
 /**
