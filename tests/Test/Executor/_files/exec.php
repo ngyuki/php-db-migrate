@@ -9,9 +9,13 @@ return array(
             $context->verbose('pdo');
             $pdo->prepare('insert into tt values (?)')->execute([999]);
         }
+        return [
+            'insert into tt values (888)',
+        ];
     },
     function ($ore, MigrationContext $context) {
         $context->exec("delete from tt where id = $ore");
         $context->exec("delete from tt where id = 999");
+        return 'delete from tt where id = 888';
     },
 );

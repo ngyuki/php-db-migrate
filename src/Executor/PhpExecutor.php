@@ -105,12 +105,21 @@ class PhpExecutor implements ExecutorInterface
         }
 
         ob_start(function ($output) {
-            $this->context->verbose($output);
+            if (strlen($output)) {
+                $this->context->verbose($output);
+            }
         }, 1);
         try {
-            $func->invokeArgs($args);
+            $ret = $func->invokeArgs($args);
         } finally {
             ob_end_flush();
+        }
+
+        if ($ret !== null) {
+            $ret = (array)$ret;
+            foreach ($ret as $sql) {
+                $this->context->exec($sql);
+            }
         }
     }
 }

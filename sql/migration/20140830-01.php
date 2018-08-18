@@ -10,6 +10,9 @@ return array(
         } else {
             $context->exec("insert into tt values ($app_value)");
         }
+        return [
+            "insert into tt values ($app_value + 1)",
+        ];
     },
     function (MigrationContext $context, $app_value) {
         if ($context->dryRun) {
@@ -17,5 +20,8 @@ return array(
         } else {
             $context->exec("delete from tt where id = $app_value");
         }
+        return [
+            "delete from tt where id = $app_value + 1",
+        ];
     },
 );
