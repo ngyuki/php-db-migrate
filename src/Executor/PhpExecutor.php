@@ -5,13 +5,21 @@ use ngyuki\DbMigrate\Migrate\MigrationContext;
 use ReflectionFunction;
 
 class PhpExecutor implements ExecutorInterface
-{   /**
+{
+    /**
+     * @var MigrationContext
+     */
+    private $context;
+
+    /**
      * @var array
      */
     private $params;
 
     public function __construct(MigrationContext $context)
     {
+        $this->context = $context;
+
         $this->params = $context->config + [
             MigrationContext::class => $context,
         ];
@@ -95,6 +103,14 @@ class PhpExecutor implements ExecutorInterface
             }
             throw new \RuntimeException("Unable resolve argument '$name'");
         }
-        $func->invokeArgs($args);
+
+        ob_start(function ($output) {
+            $this->context->verbose($output);
+        }, 1);
+        try {
+            $func->invokeArgs($args);
+        } finally {
+            ob_end_flush();
+        }
     }
 }
