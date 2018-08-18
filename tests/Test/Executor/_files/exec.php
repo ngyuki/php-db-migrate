@@ -5,7 +5,7 @@ return array(
     function (\PDO $pdo, $ore, MigrationContext $context) {
         $context->log('ore');
         $context->exec("insert into tt values ($ore)");
-        if (!$context->dryRun) {
+        if (!$context->isDryRun()) {
             $context->verbose('pdo');
             $pdo->prepare('insert into tt values (?)')->execute([999]);
         }

@@ -373,8 +373,6 @@ SQL はセミコロンでコマンドが区切られているものとして解�
 
 ```php
 <?php
-use ngyuki\DbMigrate\Migrate\MigrationContext;
-
 return [
     function () {
         // up の処理
@@ -394,36 +392,20 @@ return [
 また、クロージャーの引数には `ngyuki\DbMigrate\Migrate\MigrationContext` のインスタンスが渡されます。このインスタンスを使って SQL を実行することもできます。
 
 ```php
-/**
- * 引数で指定された SQL を実行します
- * dry-run モードでは自動的にスキップされるため呼び出し元で dry-run を判断して分岐する必要はありません
- */
-$context->exec($sql);
+<?php
+use ngyuki\DbMigrate\Migrate\MigrationContext;
 
-/**
- * コンソールにログを出力します
- */
-$context->log($log);
-
-/**
- * コンソールにログを出力します
- * このログは verbose モードで実行されているときだけ表示されます
- */
-$context->verbose($log);
-
-/**
- * 実行モードが dry-run なら true を、そうではないなら false を返します
- * `context->exec($sql)` を使っていれば dry-run を呼び出し元で判断する必要はありませんが
- * アプリケーション独自の処理を行うときは dry-run 実行時もクロージャーは呼び出されるため
- * このプロパティの値を見て処理を分岐してください
- */
-$context->dryRun;
-
-/**
- * 設定ファイルが返した連想配列をそのまま得ます
- */
-$context->config;
+return [
+    function (MigrationContext $context) {
+        $context->exec("create table tt ( id int not null primary key )");
+    },
+    function (MigrationContext $context) {
+        $context->exec("drop table tt");
+    },
+];
 ```
+
+このインタフェースに定義されたメソッドの詳細は `ngyuki\DbMigrate\Migrate\MigrationContext` の定義を確認してください。
 
 また `MigrationContext` とは別に、設定ファイルが返した連想配列の要素がクロージャーの引数に渡されます。
 引数の順番には特に意味はなく、引数は型宣言および引数名によって自動的にインジェクションされます。

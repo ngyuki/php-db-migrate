@@ -1,82 +1,52 @@
 <?php
 namespace ngyuki\DbMigrate\Migrate;
 
-use ngyuki\DbMigrate\Adapter\AdapterInterface;
-
-/**
- * @property array $config
- * @property bool $dryRun
- */
-class MigrationContext implements \ArrayAccess
+interface MigrationContext extends \ArrayAccess
 {
     /**
-     * @var array
+     * SQL を実行する
+     *
+     * このメソッドは dry-run モードならスキップされるため
+     * 呼び出し元で dry-run を判定して処理を分岐する必要はありません
+     *
+     * @param string $sql
      */
-    private $config;
+    public function exec($sql);
 
     /**
-     * @var AdapterInterface
+     * コンソールにログを出力する
+     *
+     * @param string $log
      */
-    private $adapter;
+    public function log($log);
 
     /**
-     * @var Logger
+     * コンソールにログを表示する
+     *
+     * このメソッドは verbose のときだけログを表示します
+     *
+     * @param string $log
      */
-    private $logger;
+    public function verbose($log);
 
     /**
-     * @var array
+     * 実行モードが dry-run かどうかを返す
+     *
+     * 実行モードが dry-run なら true をそうではないなら false を返します
+     *
+     * `context->exec($sql)` やクロージャーの戻り値を使う分には dry-run を
+     * 呼び出し元で判定する必要はありませんが、アプリケーション独自の処理を行うときは
+     * dry-run 実行時もクロージャーは呼び出されるため、このメソッドの用いて
+     * 実行モードを判定して処理を分岐してください
+     *
+     * @return bool
      */
-    private $properties;
+    public function isDryRun();
 
-    public function __construct(array $config, Logger $logger, AdapterInterface $adapter, $dryRun)
-    {
-        $this->adapter = $adapter;
-        $this->logger = $logger;
-
-        $this->properties = [
-            'config' => $config,
-            'dryRun' => $dryRun,
-        ];
-    }
-
-    public function exec($sql)
-    {
-        $this->adapter->exec($sql);
-    }
-
-    public function log($log)
-    {
-        $this->logger->log($log);
-    }
-
-    public function verbose($log)
-    {
-        $this->logger->verbose($log);
-    }
-
-    public function __get($name)
-    {
-        return $this->properties[$name];
-    }
-
-    public function offsetExists($offset)
-    {
-        return array_key_exists($offset, $this->config);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->config[$offset];
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        throw new \BadMethodCallException(__METHOD__);
-    }
-
-    public function offsetUnset($offset)
-    {
-        throw new \BadMethodCallException(__METHOD__);
-    }
+    /**
+     * 設定ファイルが返した連想配列をそのまま返す
+     *
+     * @return array
+     */
+    public function getConfig();
 }

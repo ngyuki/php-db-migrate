@@ -4,6 +4,7 @@ namespace Test\Migrate;
 use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
 use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\MigrationContext;
+use ngyuki\DbMigrate\Migrate\MigrationContextImpl;
 use PDO;
 use Symfony\Component\Console\Output\NullOutput;
 use TestHelper\TestCase;
@@ -42,7 +43,7 @@ class PhpExecutorTest extends TestCase
             \PDO::class => $this->pdo,
         ];
 
-        return new MigrationContext($config, $logger, $adapter, $dryRun);
+        return new MigrationContextImpl($config, $dryRun, $logger, $adapter);
     }
 
     private function fetch_list()

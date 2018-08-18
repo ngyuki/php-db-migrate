@@ -5,7 +5,7 @@ use ngyuki\DbMigrate\Migrate\MigrationContext;
 return array(
     function (MigrationContext $context, $app_value) {
         echo 'running php script';
-        if ($context->dryRun) {
+        if ($context->isDryRun()) {
             $context->exec("insert into tt values ($app_value) -- dry-run");
         } else {
             $context->exec("insert into tt values ($app_value)");
@@ -15,7 +15,7 @@ return array(
         ];
     },
     function (MigrationContext $context, $app_value) {
-        if ($context->dryRun) {
+        if ($context->isDryRun()) {
             $context->exec("delete from tt where id = $app_value -- dry-run");
         } else {
             $context->exec("delete from tt where id = $app_value");

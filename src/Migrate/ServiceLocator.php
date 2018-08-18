@@ -55,7 +55,7 @@ class ServiceLocator
 
         $adapter = (new AdapterFactory())->create($config->pdo, $logger, $dryRun, $config->migrationTable);
 
-        $context = new MigrationContext($config->config, $logger, $adapter, $dryRun);
+        $context = new MigrationContextImpl($config->config, $dryRun, $logger, $adapter);
 
         $executor = new ExecutorManager($config->workingDirectory);
         $executor->add('.php', new PhpExecutor($context));

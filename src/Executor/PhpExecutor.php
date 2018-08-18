@@ -20,7 +20,7 @@ class PhpExecutor implements ExecutorInterface
     {
         $this->context = $context;
 
-        $this->params = $context->config + [
+        $this->params = $context->getConfig() + [
             MigrationContext::class => $context,
         ];
     }
