@@ -23,7 +23,7 @@ class UnmarkCommand extends AbstractCommand
         $all = $input->getOption('all');
         $version = $input->getArgument('version');
 
-        $num = !!$all + !!strlen($version);
+        $num = (int)!!$all + (int)!!strlen($version);
 
         if ($num > 1) {
             throw new \RuntimeException("You can specify that only one --all, version.");

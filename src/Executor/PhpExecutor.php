@@ -43,6 +43,7 @@ class PhpExecutor implements ExecutorInterface
         }
 
         if (is_array($arr)) {
+            // @phan-suppress-next-line PhanSuspiciousBinaryAddLists
             $arr = array_values($arr) + array(null, null);
             return $arr;
         }

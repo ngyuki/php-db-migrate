@@ -59,15 +59,15 @@ class ConfigLoader
             throw new \RuntimeException("Unable resolve config from \"$path\".");
         }
 
-        $path = realpath($path);
-        if ($path === false) {
+        $realpath = realpath($path);
+        if ($realpath === false) {
             throw new \RuntimeException("Unable resolve config from \"$path\".");
         }
 
         /** @noinspection PhpIncludeInspection */
-        $arr = include $path;
+        $arr = include $realpath;
         $arr = $this->mustArray($arr);
-        return new Config($arr, $path);
+        return new Config($arr, $realpath);
     }
 
     private function resolveComposer()
