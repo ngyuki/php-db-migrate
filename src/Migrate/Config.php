@@ -7,6 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @property PDO      $pdo
  * @property string   $scriptDirectory
+ * @property string   $migrationTable
  * @property string   $workingDirectory
  */
 class Config extends \ArrayIterator
@@ -24,12 +25,15 @@ class Config extends \ArrayIterator
         $cfg += array(
             'pdo' => null,
             'directory' => 'migration',
+            'table' => 'migration',
             'work_dir' => dirname($file),
         );
 
         parent::__construct($cfg, self::ARRAY_AS_PROPS);
 
         $this->scriptDirectory = rtrim($this['directory'], DIRECTORY_SEPARATOR);
+
+        $this->migrationTable = $this['table'];
 
         if (strlen($this['work_dir'])) {
             $this->workingDirectory = $this['work_dir'];

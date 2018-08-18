@@ -53,7 +53,7 @@ class ServiceLocator
     {
         $logger = new Logger($output);
 
-        $adapter = (new AdapterFactory())->create($config->pdo, $logger, $dryRun);
+        $adapter = (new AdapterFactory())->create($config->pdo, $logger, $dryRun, $config->migrationTable);
 
         $context = new MigrateContext($config->toArray(), $logger, $adapter, $dryRun);
 

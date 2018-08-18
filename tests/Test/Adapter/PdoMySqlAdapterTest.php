@@ -26,7 +26,7 @@ class PdoMySqlAdapterTest extends TestCase
         $env->clear();
 
         $dryRun = false;
-        $this->adapter = new PdoMySqlAdapter($env->pdo(), new Logger(new NullOutput()), $dryRun);
+        $this->adapter = new PdoMySqlAdapter($env->pdo(), new Logger(new NullOutput()), $dryRun, 'migration');
         $this->pdo = $env->pdo();
     }
 

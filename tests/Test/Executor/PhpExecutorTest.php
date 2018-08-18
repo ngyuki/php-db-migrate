@@ -32,7 +32,7 @@ class PhpExecutorTest extends TestCase
 
         $dryRun = false;
         $logger = new Logger(new NullOutput());
-        $adapter = new PdoMySqlAdapter($this->pdo, $logger, $dryRun);
+        $adapter = new PdoMySqlAdapter($this->pdo, $logger, $dryRun, 'migration');
 
         $this->context = new MigrateContext([], $logger, $adapter, $dryRun);
     }

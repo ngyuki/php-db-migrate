@@ -32,6 +32,8 @@ return array(
     // マイグレーションスクリプトを配置するディレクトリ (default: migration)
     // 相対パスは設定フィアルからの相対として解釈
     'directory' => __DIR__ . '/sql/migration',
+    // マイグレーション管理テーブルのテーブル名 (default: migration)
+    'table' => 'migration',
 );
 ```
 

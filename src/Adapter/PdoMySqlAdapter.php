@@ -6,8 +6,6 @@ use PDO;
 
 class PdoMySqlAdapter implements AdapterInterface
 {
-    const TABLE_NAME = 'db_migrate_v3';
-
     /**
      * @var PDO
      */
@@ -23,11 +21,17 @@ class PdoMySqlAdapter implements AdapterInterface
      */
     private $dryRun;
 
-    public function __construct(\PDO $pdo, Logger $logger, $dryRun)
+    /**
+     * @var string
+     */
+    private $table;
+
+    public function __construct(\PDO $pdo, Logger $logger, $dryRun, $table)
     {
         $this->pdo = $pdo;
         $this->logger = $logger;
         $this->dryRun = $dryRun;
+        $this->table = $table;
     }
 
     private function quoteIdentity($name)
@@ -37,7 +41,7 @@ class PdoMySqlAdapter implements AdapterInterface
 
     private function quotedTable()
     {
-        return $this->quoteIdentity(self::TABLE_NAME);
+        return $this->table;
     }
 
     /**
@@ -56,11 +60,9 @@ class PdoMySqlAdapter implements AdapterInterface
         $stmt = $this->pdo->query('show tables');
         $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        if (in_array(self::TABLE_NAME, $tables)) {
+        if (in_array($this->table, $tables)) {
             return;
         }
-
-        $this->logger->log(sprintf("create table %s", self::TABLE_NAME));
 
         $sql = "
             create table {$this->quotedTable()} (
@@ -71,20 +73,7 @@ class PdoMySqlAdapter implements AdapterInterface
             )
         ";
 
-        $this->pdo->exec($sql);
-
-        if (in_array('db_migrate', $tables)) {
-            $this->logger->log(sprintf("insert into %s from %s", self::TABLE_NAME, 'db_migrate'));
-
-            $this->pdo->query("
-                insert into {$this->quotedTable()} (version, apply_at) select version, apply_at from db_migrate
-            ");
-            $this->pdo->query("
-                drop table db_migrate
-            ");
-        }
-
-        $this->logger->log('');
+        $this->exec($sql);
     }
 
     public function fetchAll()

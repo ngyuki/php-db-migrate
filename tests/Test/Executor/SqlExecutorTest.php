@@ -32,7 +32,7 @@ class SqlExecutorTest extends TestCase
         $dryRun = false;
         $logger = new Logger(new NullOutput());
 
-        $this->adapter = (new AdapterFactory())->create($this->pdo, $logger, $dryRun);
+        $this->adapter = (new AdapterFactory())->create($this->pdo, $logger, $dryRun, 'migration');
     }
 
     private function fetch_list()
