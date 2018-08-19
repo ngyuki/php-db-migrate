@@ -397,10 +397,10 @@ use ngyuki\DbMigrate\Migrate\MigrationContext;
 
 return [
     function (MigrationContext $context) {
-        $context->exec("create table tt ( id int not null primary key )");
+        $context->exec("insert into tt values (?)", [100]);
     },
     function (MigrationContext $context) {
-        $context->exec("drop table tt");
+        $context->exec("delete from tt where id = ?", [100]);
     },
 ];
 ```

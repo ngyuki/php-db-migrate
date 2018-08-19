@@ -59,7 +59,7 @@ class PhpExecutorTest extends TestCase
         $executor = new PhpExecutor($this->context);
         $executor->up(file_get_contents(__DIR__ . '/_files/exec.php'));
 
-        assertEquals(array('111', '888', '999'), $this->fetch_list());
+        assertEquals(array('111', '666', '777', '888', '999'), $this->fetch_list());
     }
 
     /**

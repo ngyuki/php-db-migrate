@@ -118,7 +118,12 @@ class PhpExecutor implements ExecutorInterface
         if ($ret !== null) {
             $ret = (array)$ret;
             foreach ($ret as $sql) {
-                $this->context->exec($sql);
+                if (!is_array($sql)) {
+                    $this->context->exec($sql);
+                } else {
+                    list ($sql, $params) = $sql + [null, null];
+                    $this->context->exec($sql, $params);
+                }
             }
         }
     }

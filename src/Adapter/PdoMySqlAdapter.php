@@ -46,12 +46,21 @@ class PdoMySqlAdapter implements AdapterInterface
 
     /**
      * @param string $sql
+     * @param array|null $params
      */
-    public function exec($sql)
+    public function exec($sql, array $params = null)
     {
-        $this->logger->verbose($sql);
-        if (!$this->dryRun) {
-            $this->pdo->exec($sql);
+        if ($params === null) {
+            $this->logger->verbose($sql);
+            if (!$this->dryRun) {
+                $this->pdo->exec($sql);
+            }
+        } else {
+            $log = $sql . ' ' . json_encode($params, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->logger->verbose($log);
+            if (!$this->dryRun) {
+                $this->pdo->prepare($sql)->execute($params);
+            }
         }
     }
 

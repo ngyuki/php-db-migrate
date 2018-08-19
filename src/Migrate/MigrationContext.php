@@ -10,8 +10,9 @@ interface MigrationContext extends \ArrayAccess
      * 呼び出し元で dry-run を判定して処理を分岐する必要はありません
      *
      * @param string $sql
+     * @param array|null $params
      */
-    public function exec($sql);
+    public function exec($sql, array $params = null);
 
     /**
      * コンソールにログを出力する

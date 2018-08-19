@@ -5,8 +5,9 @@ interface AdapterInterface
 {
     /**
      * @param string $sql
+     * @param array|null $params
      */
-    public function exec($sql);
+    public function exec($sql, array $params = null);
 
     /**
      * @return array

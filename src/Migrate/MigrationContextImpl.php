@@ -33,9 +33,9 @@ class MigrationContextImpl implements MigrationContext
         $this->dryRun = $dryRun;
     }
 
-    public function exec($sql)
+    public function exec($sql, array $params = null)
     {
-        $this->adapter->exec($sql);
+        $this->adapter->exec($sql, $params);
     }
 
     public function log($log)
