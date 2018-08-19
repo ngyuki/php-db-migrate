@@ -58,7 +58,7 @@ class ServiceLocator
         $context = new MigrationContextImpl($config->config, $dryRun, $logger, $adapter);
 
         $executor = new ExecutorManager($config->workingDirectory);
-        $executor->add('.php', new PhpExecutor($context));
+        $executor->add('.php', new PhpExecutor($context, $output));
         $executor->add('.sql', new SqlExecutor($adapter));
 
         $collector = new MigrationCollector($adapter, $config->scriptDirectory);

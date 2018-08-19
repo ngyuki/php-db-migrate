@@ -3,6 +3,7 @@ namespace ngyuki\DbMigrate\Executor;
 
 use ngyuki\DbMigrate\Migrate\MigrationContext;
 use ReflectionFunction;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class PhpExecutor implements ExecutorInterface
 {
@@ -16,9 +17,15 @@ class PhpExecutor implements ExecutorInterface
      */
     private $params;
 
-    public function __construct(MigrationContext $context)
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    public function __construct(MigrationContext $context, OutputInterface $output)
     {
         $this->context = $context;
+        $this->output = $output;
 
         $this->params = $context->getConfig() + [
             MigrationContext::class => $context,
@@ -104,16 +111,13 @@ class PhpExecutor implements ExecutorInterface
             throw new \RuntimeException("Unable resolve argument '$name'");
         }
 
-        ob_start(function ($output) {
-            if (strlen($output)) {
-                $this->context->verbose($output);
+        $ret = $this->outputLineHandle(function () use ($func, $args) {
+            return $func->invokeArgs($args);
+        }, function ($line) {
+            if ($this->output->isVerbose()) {
+                $this->output->writeln("\t" . $line, $this->output::OUTPUT_RAW);
             }
-        }, 1);
-        try {
-            $ret = $func->invokeArgs($args);
-        } finally {
-            ob_end_flush();
-        }
+        });
 
         if ($ret !== null) {
             $ret = (array)$ret;
@@ -124,6 +128,33 @@ class PhpExecutor implements ExecutorInterface
                     list ($sql, $params) = $sql + [null, null];
                     $this->context->exec($sql, $params);
                 }
+            }
+        }
+    }
+
+    private function outputLineHandle(callable $process, callable $handler)
+    {
+        $buffer = '';
+
+        ob_start(function ($output) use (&$buffer, $handler) {
+            $buffer .= $output;
+            for (;;) {
+                $pos = strpos($buffer, "\n");
+                if ($pos === false) {
+                    break;
+                }
+                $line = substr($buffer, 0, $pos);
+                $buffer = substr($buffer, $pos + 1);
+                $handler($line);
+            }
+        }, 1);
+
+        try {
+            return $process();
+        } finally {
+            ob_end_flush();
+            if (strlen($buffer)) {
+                $handler(rtrim($buffer, "\n"));
             }
         }
     }

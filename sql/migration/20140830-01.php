@@ -4,7 +4,6 @@ use ngyuki\DbMigrate\Migrate\MigrationContext;
 
 return array(
     function (MigrationContext $context, $app_value) {
-        echo 'running php script';
         if ($context->isDryRun()) {
             $context->exec("insert into tt values (?) -- dry-run", [$app_value]);
         } else {

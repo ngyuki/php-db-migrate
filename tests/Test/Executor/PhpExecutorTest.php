@@ -56,7 +56,7 @@ class PhpExecutorTest extends TestCase
      */
     public function execute_up()
     {
-        $executor = new PhpExecutor($this->context);
+        $executor = new PhpExecutor($this->context, new NullOutput());
         $executor->up(file_get_contents(__DIR__ . '/_files/exec.php'));
 
         assertEquals(array('111', '666', '777', '888', '999'), $this->fetch_list());
@@ -69,7 +69,7 @@ class PhpExecutorTest extends TestCase
     {
         $this->context = $this->createContext(true);
 
-        $executor = new PhpExecutor($this->context);
+        $executor = new PhpExecutor($this->context, new NullOutput());
         $executor->up(file_get_contents(__DIR__ . '/_files/exec.php'));
 
         assertEmpty($this->fetch_list());
@@ -83,7 +83,7 @@ class PhpExecutorTest extends TestCase
         $this->pdo->query("insert into tt values ('111')");
         $this->pdo->query("insert into tt values ('999')");
 
-        $executor = new PhpExecutor($this->context);
+        $executor = new PhpExecutor($this->context, new NullOutput());
         $executor->down(file_get_contents(__DIR__ . '/_files/exec.php'));
 
         assertEmpty($this->fetch_list());
