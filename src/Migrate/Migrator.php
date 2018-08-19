@@ -40,21 +40,21 @@ class Migrator
 
         foreach ($down as $version => $migration) {
             if ($migration->hasContent()) {
-                $this->logger->log("down: $version");
+                $this->logger->info("down: $version");
                 $this->executor->down($version, $migration->getContent());
                 $this->adapter->delete($version);
             } else {
-                $this->logger->log("unable down: $version (missing)");
+                $this->logger->info("unable down: $version (missing)");
             }
         }
 
         foreach ($up as $version => $migration) {
             if ($migration->hasContent()) {
-                $this->logger->log("up: $version");
+                $this->logger->info("up: $version");
                 $this->executor->up($version, $migration->getContent());
                 $this->adapter->save($version, $migration->getContent());
             } else {
-                $this->logger->log("unable up: $version (missing)");
+                $this->logger->info("unable up: $version (missing)");
             }
         }
 
@@ -67,7 +67,7 @@ class Migrator
                 }
             }
 
-            $this->logger->log("migrate nothing ... latest version: $latest");
+            $this->logger->info("migrate nothing ... latest version: $latest");
         }
     }
 }

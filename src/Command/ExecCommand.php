@@ -25,7 +25,7 @@ class ExecCommand extends AbstractCommand
 
         foreach ($scripts as $name => $script) {
             $migration = (new Migration())->setScript($script);
-            $this->locator->logger->log("exec: $name");
+            $this->locator->logger->info("exec: $name");
             $this->locator->executor->up($name, $migration->getContent());
         }
     }

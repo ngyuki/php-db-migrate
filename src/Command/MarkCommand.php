@@ -39,7 +39,7 @@ class MarkCommand extends AbstractCommand
                     // skip
                 } else {
                     $this->locator->adapter->save($version, $migration->getContent());
-                    $this->locator->logger->log("mark: $version");
+                    $this->locator->logger->info("mark: $version");
                 }
             }
         } elseif (strlen($version)) {
@@ -50,12 +50,12 @@ class MarkCommand extends AbstractCommand
             $migration = $migrations[$version];
 
             if ($migration->isApplied()) {
-                $this->locator->logger->log("version already migrated: $version");
+                $this->locator->logger->info("version already migrated: $version");
             } elseif ($migration->isMissing()) {
-                $this->locator->logger->log("mark: $version is missing");
+                $this->locator->logger->info("mark: $version is missing");
             } else {
                 $this->locator->adapter->save($version, $migration->getContent());
-                $this->locator->logger->log("mark: $version");
+                $this->locator->logger->info("mark: $version");
             }
         } else {
             throw new \RuntimeException("Please specify one of --all, version.");

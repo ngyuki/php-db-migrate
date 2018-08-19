@@ -3,7 +3,7 @@ use ngyuki\DbMigrate\Migrate\MigrationContext;
 
 return array(
     function (\PDO $pdo, $ore, MigrationContext $context) {
-        $context->log('ore');
+        $context->info('ore');
         $context->exec("insert into tt values (?)", [$ore]);
         if (!$context->isDryRun()) {
             $context->verbose('pdo');

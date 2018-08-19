@@ -38,14 +38,14 @@ class MigrationContextImpl implements MigrationContext
         $this->adapter->exec($sql, $params);
     }
 
-    public function log($log)
+    public function info($message)
     {
-        $this->logger->log($log);
+        $this->logger->info($message);
     }
 
-    public function verbose($log)
+    public function verbose($message)
     {
-        $this->logger->verbose($log);
+        $this->logger->verbose($message);
     }
 
     public function isDryRun()

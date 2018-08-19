@@ -17,18 +17,18 @@ interface MigrationContext extends \ArrayAccess
     /**
      * コンソールにログを出力する
      *
-     * @param string $log
+     * @param string $message
      */
-    public function log($log);
+    public function info($message);
 
     /**
      * コンソールにログを表示する
      *
      * このメソッドは verbose のときだけログを表示します
      *
-     * @param string $log
+     * @param string $message
      */
-    public function verbose($log);
+    public function verbose($message);
 
     /**
      * 実行モードが dry-run かどうかを返す
