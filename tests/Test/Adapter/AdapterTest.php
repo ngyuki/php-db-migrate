@@ -1,17 +1,18 @@
 <?php
 namespace Test\Migrate;
 
+use ngyuki\DbMigrate\Driver\PdoMySqlDriver;
 use ngyuki\DbMigrate\Migrate\Logger;
 use PDO;
 use Symfony\Component\Console\Output\NullOutput;
 use TestHelper\TestCase;
 use TestHelper\TestEnv;
-use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
+use ngyuki\DbMigrate\Adapter\Adapter;
 
-class PdoMySqlAdapterTest extends TestCase
+class AdapterTest extends TestCase
 {
     /**
-     * @var PdoMySqlAdapter
+     * @var Adapter
      */
     private $adapter;
 
@@ -26,22 +27,8 @@ class PdoMySqlAdapterTest extends TestCase
         $env->clear();
 
         $dryRun = false;
-        $this->adapter = new PdoMySqlAdapter($env->pdo(), new Logger(new NullOutput()), $dryRun, 'migration');
+        $this->adapter = new Adapter(new PdoMySqlDriver($env->pdo()), new Logger(new NullOutput()), $dryRun, 'migration');
         $this->pdo = $env->pdo();
-    }
-
-    /**
-     * @test
-     */
-    public function create_()
-    {
-        // テーブルを作成する
-        $this->adapter->createTable();
-
-        // テーブルが作成されていても失敗しない
-        $this->adapter->createTable();
-
-        assertTrue(true);
     }
 
     /**
@@ -71,7 +58,6 @@ class PdoMySqlAdapterTest extends TestCase
      */
     public function clear_()
     {
-        $this->adapter->createTable();
         $this->adapter->clear();
 
         $rows = $this->pdo->query('show tables')->fetchAll();

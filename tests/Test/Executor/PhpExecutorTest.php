@@ -1,7 +1,8 @@
 <?php
 namespace Test\Migrate;
 
-use ngyuki\DbMigrate\Adapter\PdoMySqlAdapter;
+use ngyuki\DbMigrate\Adapter\Adapter;
+use ngyuki\DbMigrate\Driver\PdoMySqlDriver;
 use ngyuki\DbMigrate\Migrate\Logger;
 use ngyuki\DbMigrate\Migrate\MigrationContext;
 use ngyuki\DbMigrate\Migrate\MigrationContextImpl;
@@ -36,7 +37,7 @@ class PhpExecutorTest extends TestCase
     private function createContext($dryRun = false)
     {
         $logger = new Logger(new NullOutput());
-        $adapter = new PdoMySqlAdapter($this->pdo, $logger, $dryRun, 'migration');
+        $adapter = new Adapter(new PdoMySqlDriver($this->pdo), $logger, $dryRun, 'migration');
 
         $config = [
             'ore' => 111,
