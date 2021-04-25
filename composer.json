@@ -9,6 +9,8 @@
         { "name": "ngyuki", "email": "ngyuki.jp@gmail.com" }
     ],
     "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
         "platform": {
             "php": "7.0.10"
         }
