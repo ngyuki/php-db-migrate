@@ -18,13 +18,15 @@ services:
       - --character-set-server=utf8
 
   php:
-    image: ngyuki/php-dev:7.0
+    image: ngyuki/php-dev:${PHP_VERSION:-7.0}
+    init: true
+    user: ${DOCKER_USER:-0}
+    depends_on:
+      - mysql
     volumes:
       - ./:/app/
     working_dir: /app/
-    stop_signal: KILL
-    environment:
-      <<: *environment
+    environment: *environment
     command:
       - sh
       - -c
