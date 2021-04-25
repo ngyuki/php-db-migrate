@@ -24,7 +24,7 @@ class StatusReporter
     /**
      * マイグレーションの状態を表示
      */
-    public function show()
+    public function show(bool $missing)
     {
         $migrations = $this->collector->listMigrations();
 
@@ -49,7 +49,9 @@ class StatusReporter
 
             if ($migration->isMissing()) {
                 $line .= " <fg=red;options=bold>(missing)</>";
-                $code = 1;
+                if ($missing) {
+                    $code = 1;
+                }
             }
 
             $this->output->writeln($line);

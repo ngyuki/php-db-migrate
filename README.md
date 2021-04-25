@@ -96,7 +96,7 @@ $ vendor/bin/db-migrate status
 [ ] 20140828-01.sql
 ```
 
-すべてのバージョンが適用済で、ファイルが失われてもいなければ終了コードは 0 になります。
+すべてのバージョンが適用済であれば終了コードが 0 になります。
 
 ```console
 $ vendor/bin/db-migrate status ; echo -e "\nexit code: $?"
@@ -107,14 +107,35 @@ $ vendor/bin/db-migrate status ; echo -e "\nexit code: $?"
 exit code: 0
 ```
 
-未適用のバージョンがあるか、あるいは適用済でも失われたファイルがある場合は終了コードは 1 になります。
+未適用のバージョンがあれば終了コードは 1 になります。
 
+```console
+$ vendor/bin/db-migrate status ; echo -e "\nexit code: $?"
+[*] 20140827-01.sql
+[*] 20140827-02.sql
+[ ] 20140828-01.sql
+
+exit code: 1
+```
+
+すべてのバージョンが適用済であれば、失われたファイルがあったとしても終了コードは 0 です。
 
 ```console
 $ vendor/bin/db-migrate status ; echo -e "\nexit code: $?"
 [*] 20140827-01.sql
 [*] 20140827-02.sql (missing)
-[ ] 20140828-01.sql
+[*] 20140828-01.sql
+
+exit code: 0
+```
+
+`--missing` を指定すると、失われたファイルがあるときは終了コードが 1 になります。
+
+```console
+$ vendor/bin/db-migrate status --missing ; echo -e "\nexit code: $?"
+[*] 20140827-01.sql
+[*] 20140827-02.sql (missing)
+[*] 20140828-01.sql
 
 exit code: 1
 ```

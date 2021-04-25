@@ -36,20 +36,21 @@ class ApplicationTest extends TestCase
     /**
      * @test
      */
-    public function status_()
-    {
-        $rc = $this->tester->run('status');
-        self::assertEquals(0, $rc);
-    }
-
-    /**
-     * @test
-     */
     public function migrate_()
     {
         $this->tester->run('migrate');
 
         assertEquals(array("1000.sql", "3000.php", "9999.sql"), $this->env->versions());
+    }
+
+    /**
+     * @test
+     */
+    public function status_()
+    {
+        $this->tester->run('migrate');
+        $rc = $this->tester->run('status');
+        assertEquals(0, $rc);
     }
 
     /**

@@ -3,11 +3,13 @@ namespace TestHelper;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class ApplicationTester
 {
     private $application;
+    private $output;
 
     public function __construct(Application $application)
     {
@@ -20,9 +22,11 @@ class ApplicationTester
         array_unshift($argv, __FILE__);
 
         $input = new ArgvInput($argv);
-        $output = new NullOutput();
+        $output = new BufferedOutput();
 
-        return $this->application->run($input, $output);
+        $ret = $this->application->run($input, $output);
+        $this->output = $output->fetch();
+        return $ret;
     }
 
     public function runArgs($argv)
@@ -33,5 +37,10 @@ class ApplicationTester
         $output = new NullOutput();
 
         return $this->application->run($input, $output);
+    }
+
+    public function getOutput()
+    {
+        return $this->output;
     }
 }
