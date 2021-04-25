@@ -1,5 +1,6 @@
 /build
 /vendor
+/composer.lock
 /phpunit.xml
 /.php_cs.cache
 /sql/db-migrate.php
