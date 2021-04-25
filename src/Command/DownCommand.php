@@ -19,8 +19,8 @@ class DownCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $all = $input->getOption('all');
-        $missing = $input->getOption('missing');
+        $all = (bool)$input->getOption('all');
+        $missing = (bool)$input->getOption('missing');
         if ($all && $missing) {
             throw new \RuntimeException("You can specify that only one --all, --missing.");
         }
